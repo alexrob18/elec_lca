@@ -8,3 +8,6 @@ wurst
 jupyterlab
 notebook
 brightway25
+openpyxl
+warnings
+pathlib
