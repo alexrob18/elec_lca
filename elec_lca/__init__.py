@@ -3,9 +3,9 @@
 __all__ = (
     "__version__",
     # Add functions and variables you want exposed in `elec_lca.` namespace here
-    "read_input_excel_file",
+    "read_user_input_template_excel_file",
 )
 
 __version__ = "0.0.1"
 
-from .reading import read_input_excel_file
+from .reading import read_user_input_template_excel_file

@@ -12,7 +12,7 @@ warnings.filterwarnings(
 )
 
 
-def read_input_excel_file(
+def read_user_input_template_excel_file(
         user_input_directory="../data",
         user_input_template_filename="user_input_template.xlsm",
 ):
