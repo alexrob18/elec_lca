@@ -5,3 +5,5 @@ schema
 premise
 datapackage
 wurst
+jupyterlab
+notebook
