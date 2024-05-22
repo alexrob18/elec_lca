@@ -1,12 +1,12 @@
-Technology name,product_name,activity_name,region,unit
-Centralized Solar Photovoltaic,"electricity, low voltage","electricity production, photovoltaic, 570kWp open ground installation, multi-Si",CA-QC,/kWh
-Coal Power Plant,"electricity, high voltage","electricity production, hard coal",CA-QC,/kWh
-Co-generation from wood,"electricity, high voltage","heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014",CA-QC,/kWh
-Combined Cycle Gas Turbine,"electricity, high voltage","electricity production, natural gas, combined cycle power plant",CA-ON,/kWh
-Decentralized Solar Photovoltaic,"electricity, low voltage","electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",CA-QC,/kWh
-Geothermal Energy,"electricity, high voltage","electricity production, deep geothermal",RoW,/kWh
-Hydroelectric Dam,"electricity, high voltage","electricity production, hydro, reservoir, non-alpine region",CA-QC,/kWh
-Hydroelectric River,"electricity, high voltage","electricity production, hydro, run-of-river",CA-QC,/kWh
-Nuclear,"electricity, high voltage","electricity production, nuclear, pressure water reactor",RoW,/kWh
-Wind Energy Offshore,"electricity, high voltage","electricity production, wind, 1-3MW turbine, offshore",RoW,/kWh
-Wind Energy Onshore,"electricity, high voltage","electricity production, wind, 1-3MW turbine, onshore",CA-QC,/kWh
+Technology name,product_name,activity_name,unit
+Centralized Solar Photovoltaic,"electricity, low voltage","electricity production, photovoltaic, 570kWp open ground installation, multi-Si",/kWh
+Coal Power Plant,"electricity, high voltage","electricity production, hard coal",/kWh
+Co-generation from wood,"electricity, high voltage","heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014",/kWh
+Combined Cycle Gas Turbine,"electricity, high voltage","electricity production, natural gas, combined cycle power plant",/kWh
+Decentralized Solar Photovoltaic,"electricity, low voltage","electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",/kWh
+Geothermal Energy,"electricity, high voltage","electricity production, deep geothermal",/kWh
+Hydroelectric Dam,"electricity, high voltage","electricity production, hydro, reservoir, non-alpine region",/kWh
+Hydroelectric River,"electricity, high voltage","electricity production, hydro, run-of-river",/kWh
+Nuclear,"electricity, high voltage","electricity production, nuclear, pressure water reactor",/kWh
+Wind Energy Offshore,"electricity, high voltage","electricity production, wind, 1-3MW turbine, offshore",/kWh
+Wind Energy Onshore,"electricity, high voltage","electricity production, wind, 1-3MW turbine, onshore",/kWh
