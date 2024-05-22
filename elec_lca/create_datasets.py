@@ -41,12 +41,12 @@ def searching_dataset(database, act_dict):
 def new_electricity_market(database, location, df_scenario, df_mapping):
 
     exchanges = [] # list of exchanges of the electricity market
-    tech_list = list(df_scenario.Technology.unique()) # list of technologies involved in the scenario
+    tech_list = list(df_scenario.technology.unique()) # list of technologies involved in the scenario
 
     for tech in tech_list: # create the list of exchanges (i.e., shares of the electricity mix)
         ds = searching_dataset(database=database, act_dict=mapping(df_mapping=df_mapping, tech=tech, location=location))
         exc = {
-            'amount': float(df_scenario[df_scenario.Technology == tech].Value),
+            'amount': float(df_scenario[df_scenario.technology == tech].value),
             'type': 'technosphere',
             'name': ds['name'],
             'database': database,
