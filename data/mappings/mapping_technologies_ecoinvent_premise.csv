@@ -1,0 +1,18 @@
+Technology name,product_name,activity_name,region,unit,ecoinvent,present
+Centralized Solar Photovoltaic,"electricity, low voltage","electricity production, photovoltaic, 570kWp open ground installation, multi-Si",CA-QC,/kWh,TRUE,TRUE
+Coal Ultra-Supercritical,"electricity, high voltage","electricity production, at lignite-fired power plant, pulverised",RER,/kWh,FALSE,TRUE
+Coal Ultra-Supercritical with Carbon Capture,"electricity, high voltage","electricity production, at lignite-fired power plant, post, pipeline 200km, storage 1000m",RER,/kWh,FALSE,FALSE
+Co-generation from wood,"electricity, high voltage","heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014",CA-QC,/kWh,TRUE,TRUE
+Combined Cycle Gas Turbine,"electricity, high voltage","electricity production, at natural gas-fired combined cycle power plant",RER,/kWh,FALSE,TRUE
+Combined Cycle Gas Turbine with Carbon Capture,"electricity, high voltage","electricity production, at natural gas-fired combined cycle power plant, post, pipeline 200km, storage 1000m",RER,/kWh,FALSE,FALSE
+Decentralized Solar Photovoltaic,"electricity, low voltage","electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",CA-QC,/kWh,TRUE,TRUE
+Geothermal Energy,"electricity, high voltage","electricity production, deep geothermal",RoW,/kWh,TRUE,TRUE
+Hydroelectric Dam,"electricity, high voltage","electricity production, hydro, reservoir, non-alpine region",CA-QC,/kWh,TRUE,TRUE
+Hydroelectric River,"electricity, high voltage","electricity production, hydro, run-of-river",CA-QC,/kWh,TRUE,TRUE
+Integrated Gasification Combined Cycle,"electricity, high voltage","electricity production, at hard coal-fired IGCC power plant",RER,/kWh,FALSE,TRUE
+Integrated Gasification Combined Cycle with Carbon Capture,"electricity, high voltage","electricity production, at hard coal-fired IGCC power plant, pre, pipeline 200km, storage 1000m",RER,/kWh,FALSE,FALSE
+Nuclear,"electricity, high voltage","electricity production, nuclear, pressure water reactor",RoW,/kWh,TRUE,TRUE
+Small modular reactors,"electricity, high voltage","electricity production, Small Modular Reactor (SMR)",CH,/kWh,FALSE,FALSE
+Wave energy,"electricity, high voltage","electricity production, wave energy converter",RER,/kWh,FALSE,TRUE
+Wind Energy Offshore,"electricity, high voltage","electricity production, wind, 1-3MW turbine, offshore",RoW,/kWh,TRUE,TRUE
+Wind Energy Onshore,"electricity, high voltage","electricity production, wind, 1-3MW turbine, onshore",CA-QC,/kWh,TRUE,TRUE

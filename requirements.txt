@@ -7,3 +7,4 @@ datapackage
 wurst
 jupyterlab
 notebook
+brightway25
