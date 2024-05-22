@@ -67,6 +67,10 @@ def read_user_input_template_excel_file(
 
     # Concatenate all the DataFrames
     df_total = pd.concat(list_df, axis=1)
+
+    # Check input data format
+    check_input_data_format(df_total)
+
     return df_total
 
 
@@ -79,7 +83,7 @@ def range_to_df(worksheet, remove_nan=True):
     worksheet: openpyxl.Worksheet
         Worksheet range to convert into a DataFrame.
     remove_nan: bool
-        True, if rows and columsn containing all NaN values should be removed.
+        True, if rows and columns containing all NaN values should be removed.
 
     Returns
     -------
@@ -112,7 +116,7 @@ def validate_file_exists(filepath, expected_extension=None):
 
     Parameters
     ----------
-    filepath: str or pathlib.Pathread_excel
+    filepath: str or pathlib.Path
         Path to file to be validated.
     expected_extension: str
         Extension the file should have (including the period, e.g. '.csv').
@@ -144,3 +148,41 @@ def validate_file_exists(filepath, expected_extension=None):
             ))
 
     return filepath
+
+
+def check_input_data_format(
+    df
+):
+    """Checks if the input data has the proper format.
+
+    Parameters
+    ----------
+    df: pd.DataFrame
+        DataFrame that contains the input data.
+
+    Returns
+    -------
+    None
+
+    """
+    # Check if the DataFrame has the proper list of columns
+    column_list = ["scenario", "location", "period", "technology", "value"]
+    if list(df.columns).sort() != column_list.sort():
+        raise NotImplementedError("List of columns does not match : {}".format(column_list))
+
+    # Check if all items in the column "value" are float
+    try:
+        df["value_float"] = df["value"].astype("float")
+    except ValueError:
+        raise ValueError("Some grid mix values were not numbers.")
+    if not df["value_float"].equals(df["value"]):
+        raise NotImplementedError("Some grid mix values were not float")
+    df.drop(columns=["value_float"], inplace=True)
+
+    # Check that the sum of grid mix per scenario/location/period is equal to 1
+    df_grouped = df[["scenario", "location", "period", "value"]].groupby(["scenario", "location", "period"]).sum()
+    df_grouped.reset_index(inplace=True)
+    df_not_valid = df_grouped[(df_grouped["value"] > 1.01) | (df_grouped["value"] < 0.99)].copy()
+    if len(df_not_valid.index) > 0:
+        raise NotImplementedError("Values for the following scenario, location and period combinations do not sum to "
+                                  "1: \n {}".format(df_not_valid))
