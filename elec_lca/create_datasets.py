@@ -4,6 +4,7 @@ import bw2data
 import uuid
 from pathlib import Path
 import pkg_resources
+import elec_lca
 
 
 def mapping(tech, location, mapping_filepath=None):
@@ -61,14 +62,15 @@ def searching_dataset(database, act_dict):
     return ds
 
 
-def new_electricity_market(database, location, df_scenario, mapping_filepath=None):
+def new_electricity_market(database, location, df_scenario, methods, mapping_filepath=None):
     '''
     Creates a new database into which the electricity mix (high voltage) is replaced by the one specified by the user.
     :param database: wurst database
     :param location: (str) ecoinvent location code
     :param df_scenario: (pandas Dataframe) dataframe of an energy scenario, containing the shares (value column) for each energy technology (technology column)
+    :param methods: (list of str): impact assessment methods to consider
     :param mapping_filepath: (str) path to mapping between energy technologies names and ecoinvent LCI datasets
-    :return: (wurst dataset) the newly created electricity mix dataset
+    :return: (datapackage) database datapackage
     '''
     name_database = database[0]['database']
 
@@ -135,8 +137,10 @@ def new_electricity_market(database, location, df_scenario, mapping_filepath=Non
 
     db.append(ds_mix) # add the new electricity market to the database
 
-    if f'ecoinvent_updated_electricity_mix_{location}' in bw2data.databases:
-        del bw2data.databases[f'ecoinvent_updated_electricity_mix_{location}']
-    wurst.write_brightway2_database(db, f'ecoinvent_updated_electricity_mix_{location}') # write new database in brightway
+    # if f'ecoinvent_updated_electricity_mix_{location}' in bw2data.databases:
+    #     del bw2data.databases[f'ecoinvent_updated_electricity_mix_{location}']
+    # wurst.write_brightway2_database(db, f'ecoinvent_updated_electricity_mix_{location}') # write new database in brightway
 
-    return ds_mix
+    dps, tech_dict, bio_dict = elec_lca.datapackage.create_datapackage(database, methods=methods)
+
+    return dps, tech_dict, bio_dict
