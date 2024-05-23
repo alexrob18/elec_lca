@@ -6,4 +6,7 @@ datapackage
 wurst
 brightway25
 pathlib
+bw_graph_tools
+panel
+plotly
 bw_processing
