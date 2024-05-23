@@ -78,7 +78,7 @@ def read_user_input_template_excel_file(
     # Concatenate all the DataFrames
     if len(list_df) == 0:
         raise ValueError("No data was provided.")
-    df_total = pd.concat(list_df, axis=1)
+    df_total = pd.concat(list_df, axis=0)
 
     # Check input data format
     check_input_data_format(df_total)
@@ -183,10 +183,10 @@ def check_input_data_format(
         raise NotImplementedError("List of columns does not match : {}".format(column_list))
 
     # Check if all items in the column "value" are float
-    try:
-        df["value_float"] = df["value"].astype("float")
-    except ValueError:
-        raise ValueError("Some grid mix values were not numbers.")
+    #try:
+    df["value_float"] = df["value"].astype("float")
+    # except ValueError:
+    #    raise ValueError("Some grid mix values were not numbers.")
     if not df["value_float"].equals(df["value"]):
         raise NotImplementedError("Some grid mix values were not float")
     df.drop(columns=["value_float"], inplace=True)
