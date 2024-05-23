@@ -1,5 +1,45 @@
+from pathlib import Path
+from elec_lca.reading import read_user_input_template_excel_file
+import openpyxl
 import panel as pn
 import pandas as pd
+import plotly.graph_objs as go
+
+def stacked_area_chart(scenario):
+    df_scenarios = read_user_input_template_excel_file('../data', 'user_input_template.xlsm')
+
+    layout = go.Layout(
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)'
+    )
+
+    fig = go.Figure(layout=layout)
+    df_scenario = df_scenarios[df_scenarios.scenario == scenario]
+    df_scenario = df_scenario.sort_values(by=['period'])
+    tech_list = list(df_scenario.technology.unique())
+    t = list(df_scenario.period.unique())
+
+    for tech in tech_list:
+        data = list(100 * df_scenario[df_scenario.technology == tech].value)
+        fig.add_trace(go.Scatter(
+            x=t, y=data,
+            # hoverinfo='x+y',
+            mode='lines',
+            name=tech,
+            # line=dict(width=0.5, color='rgb(131, 90, 241)'),
+            stackgroup='one'  # define stack group
+        ))
+
+    fig.update_layout(
+        xaxis_title="Years",
+        yaxis_title="Shares [%]",
+        legend_title="Technologies",
+    )
+
+    fig.update_traces(mode="markers+lines", hovertemplate=None)
+    fig.update_layout(hovermode="x unified")
+
+    return fig
 
 pn.extension()
 
@@ -51,6 +91,7 @@ df = pd.DataFrame({
 }, index=[1, 2, 3])
 widget_df_input_data = pn.widgets.DataFrame(df, name='Inputs', sizing_mode='stretch_both')
 widget_df_results = pn.widgets.DataFrame(df, name='Results', sizing_mode='stretch_both')
+widget_plotly_pane_results = pn.pane.Plotly(stacked_area_chart("BAU"))
 
 gspec = pn.GridSpec(sizing_mode='stretch_both', max_height=800)
 
@@ -70,6 +111,6 @@ gspec[:,   0] = pn.Column(
 
 gspec[0, 1:2] = widget_df_input_data
 gspec[1, 1] = widget_df_results
-gspec[1, 2] = pn.Spacer(styles=dict(background='purple'))
+gspec[1, 2] = widget_plotly_pane_results
 
 gspec.servable()
