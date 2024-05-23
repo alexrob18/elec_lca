@@ -42,12 +42,12 @@ class get_A_matrix_elec_scn_array:
             get_indice_from_A: indice for the elec_act from the A matrix
         """ 
         elec_act = self.elec_act
-        lca = bc.LCA(demand = {elec_act:1})
+        lca = bc.LCA(demand={elec_act: 1})
         lca.lci()
         dp_A = lca.technosphere_matrix
-        #for BW25: lca.dicts.activity[bd.get_id((database_name, code_act))]
-        get_indice_from_A = lca.activity_dict[elec_act]  # for BW2 
-        return (dp_A, get_indice_from_A)
+        # for BW25: lca.dicts.activity[bd.get_id((database_name, code_act))]
+        get_indice_from_A = lca.dicts.activity[elec_act]  # for BW2
+        return get_indice_from_A
 
     
     def convert_techx_to_bw2act (self, act_tech): 

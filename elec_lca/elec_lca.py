@@ -1,7 +1,10 @@
 import pandas
+import pandas as pd
+
 from elec_lca.reading import read_user_input_template_excel_file
 from elec_lca.create_datasets import new_electricity_market
 from elec_lca.create_user_input_file import create_user_input_file
+from elec_lca.lca_results import get_elec_impact
 
 
 class Elec_LCA:
@@ -14,14 +17,16 @@ class Elec_LCA:
     df_scenario = None
     original_database = None
     modified_database = {}
+    array_to_modify = {}
     mapping_filepath = None
+    df_results = None
 
     def __init__(self, original_database):
         self.original_database = original_database
 
-    def load_custom_mapping_to_ei(self):
+    def load_custom_mapping_to_ei(self, mapping_filepath):
 
-        self.mapping_filepath()
+        self.mapping_filepath = mapping_filepath
 
     def create_input_file(self, output_directory):
         filepath = create_user_input_file(
@@ -46,9 +51,11 @@ class Elec_LCA:
                         self.user_input_location_dir,
                         user_input_template_filename=self.user_input_location_filename,
                     )
+                    return
                 except Exception as e:
                     print("The file could not be loaded because of the following error, please fix it and retry: ")
                     print(e)
+                    return
             print("No default user input file has been create, use:\n"
                   "create_input_file(output_directory: str, pathlin)")
             return
@@ -73,10 +80,65 @@ class Elec_LCA:
                 mapping_filepath=self.mapping_filepath
             )
 
+            df_of_modified_scenario = scn_df[scn_df["location"] == loc].copy()
+            df_of_modified_scenario = df_of_modified_scenario.pivot_table(
+                values="value", index=["scenario", "period"], columns="technology", aggfunc='sum'
+            ).set_index(["scenario", "period"])
+
             self.modified_database[loc] = modified_dataset.copy()
+            self.array_to_modify[loc] = df_of_modified_scenario
 
     def view_available_location(self):
         print("This object contains modified dataset for the following location:")
         for loc in self.modified_database.keys():
             print(f"...{loc}")
+
+    def compute_lca_score_for_all_scenario(self, impact_method_list):
+        """
+
+        Parameters
+        ----------
+        impact_method_list :
+
+        Returns
+        -------
+
+        """
+
+        results_list = []
+        # pd.DataFrame(columns=["location", "period", "scenario"] + impact_method_list)
+
+        for loc in self.modified_database.keys():
+            for (scn, per) in self.array_to_modify[loc]:
+                elec_scn_arr = None
+                for impact_method in impact_method_list:
+                    score = get_elec_impact(
+                                self.modified_database[loc],
+                                elec_scn_arr,
+                                impact_method,
+                                activity='market for electricity, low voltage'
+                            )
+                    res = pd.DataFrame(columns=["location", "period", "scenario"] + impact_method_list)
+                    res["location"] = [loc]
+                    res["period"] = per
+                    res["scenario"] = scn
+                    for method in impact_method_list:
+                        res[method] = 0 if method != impact_method else score
+                    results_list.append(res.copy())
+
+        self.df_results = pd.concat(results_list, axis=0)
+
+    # def get_specific_results(self, scenario, period, location):
+    #     if self.df_results is None:
+    #         print("results has not been generated")
+    #         return
+    #
+    #     quit_flag =
+    #     if location not in self.df_results["location"].unique().tolist():
+    #         print("No input were provided for target location")
+    #     if period not in self.df_results["period"].unique().tolist():
+    #         print("No input were provided for target period")
+    #     if scenario not in self.df_results["scenario"].unique().tolist():
+    #         print("No input were provided for target scenario")
+
 
