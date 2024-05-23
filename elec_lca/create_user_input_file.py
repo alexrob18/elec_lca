@@ -34,9 +34,14 @@ def create_user_input_file(output_directory, warn_if_dir_created=True,  force_ov
               "\t\tforce_overwrite=True")
         return Path(output_directory) / "Elec_lca_user_input.xlsm"
 
-    shutil.copy(Path(pkg_resources.resource_stream(__name__, "user_input_template.xlsm").name),
+    current_file = Path(pkg_resources.resource_stream(__name__, "__init__.py").name)
+    shutil.copy(current_file.parent.parent / "data/user_input_template.xlsm",
                 Path(output_directory) / "Elec_lca_user_input.xlsm")
     print(f'File created at {Path(output_directory) / "Elec_lca_user_input.xlsm"}')
     print("***Make sure to enable macro when the file opens.***")
 
     return Path(output_directory) / "Elec_lca_user_input.xlsm"
+
+
+if __name__ == "__main__":
+    create_user_input_file(output_directory=Path(r"C:\modelling\spring_school\elec_lca\elec_lca\dev"))
