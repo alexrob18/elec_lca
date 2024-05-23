@@ -13,3 +13,4 @@ warnings
 pathlib
 bw_graph_tools
 panel
+plotly
