@@ -14,7 +14,20 @@ from elec_lca.lca_results import get_elec_impact, get_elec_A_mat_indice_for_Scn_
 
 class Elec_LCA:
     """
-
+    Main class to prepare final lca results once the database is prepared (by create_datasets.py) 
+    Computes LCA by calling lca_results.py, where a base A_matrix and a changing array_to_modify per scenario per year is used in matrix calculation. This enables a faster computation of LCA per scenario/year. 
+    
+    Parameters
+    ----------
+    user_input_location_dir: absolute filepath in users' local drives that stores user-input excel file 
+    user_input_location_filename: the file name for user-input excel 
+    df_scenario: user supplied scenarios
+    original_database: the original background database supplied by user
+    modified_database: dict of modified database for the new electricity market
+    array_to_modify: dict of array to be used by bw2calc per scenario / year 
+    mapping_filepath: file path for technology mapping: map user-defined technology to background dataset  
+    df_results: the final lca results returned per scenario / year 
+    
     """
 
     user_input_location_dir = None
@@ -57,12 +70,22 @@ class Elec_LCA:
             json.dump(flows, f)
         self.method_list = [" - ".join(i) for i in methods]
 
-    # load Data
+    
     def load_custom_mapping_to_ei(self, mapping_filepath):
-
+    """     locate the technology mapping file , doesn't return anything  """
         self.mapping_filepath = mapping_filepath
 
+
     def create_input_file(self, output_directory):
+    """ 
+    create an input_file, 
+    prepare: user_input_location_dir and user_input_location_filename
+    
+    Parameters
+    ----------
+    output_directory: the user's output directory in the local drive 
+    """
+        
         filepath = create_user_input_file(
             output_directory,
             warn_if_dir_created=True,
@@ -72,6 +95,19 @@ class Elec_LCA:
         self.user_input_location_filename = filepath.name
 
     def load_user_input_file(self, use_default_user_input_file=True, custom_csv_filepath=None):
+        """ 
+        load users input excel to prepare the input data
+        
+        Parameters
+        ----------
+        use_default_user_input_file: default is true, use user's input file
+        custom_csv_filepath: 
+
+        Prepares:
+        ----------
+        self.df_scenario: the scenarios pulled from user input excel 
+        
+        """
 
         if custom_csv_filepath is not None and not use_default_user_input_file:
             print("this functionality is not been programmed yet, please use the "
@@ -99,6 +135,18 @@ class Elec_LCA:
 
     # make calculation
     def create_new_location_dataset(self, overwrite_data_set=False):
+        """ 
+        to create a new dataset according to user's input location, through create_datasets.py module / new_electricity_market
+        
+        Parameters
+        ----------
+        overwrite_data_set: default False, if there is already the dataset for user-specified location from original database
+
+        Prepares:
+        ----------
+        self.modified_database: the dict of modified database, key is the location, value is the modified database
+        self.array_to_modify: the dict of array to be used by bw2calc per scenario / year  
+        """
 
         scn_df = self.df_scenario.copy()
         location_list = scn_df["location"].unique().tolist()
@@ -131,20 +179,23 @@ class Elec_LCA:
             self.data_array_to_modify[loc] = df_of_modified_scenario.to_numpy()
 
     def view_available_location(self):
+        """ to print out the modified locations """
         print("This object contains modified dataset for the following location:")
         for loc in self.modified_database.keys():
             print(f"...{loc}")
 
     def compute_lca_score_for_all_scenario(self, impact_method_list):
         """
+        compute the final lca score for all scenarios and years, combined into one final dataframe
 
         Parameters
         ----------
-        impact_method_list :
+        impact_method_list: a list of bw2data.methods 
+        example: ('TRACI v2.1 no LT', 'climate change no LT', 'global warming potential (GWP100) no LT')
 
-        Returns
+        Prepares
         -------
-
+        df_results: the lca results run though matrix calcuation from lca_results.py , get_elec_impact
         """
 
         results_list = []
@@ -197,6 +248,20 @@ class Elec_LCA:
 
     # get results
     def get_specific_results(self, scenario, period, location):
+        """
+        get lca result for specific scenario and year(s) from the final df_results prepared in compute_lca_score_for_all_scenario()  
+
+        Parameters
+        ----------
+        scenario: specific scenario to get from the final df_results
+        period:   specific period to get from the final df_results
+        location: specific location to get from the final df_results
+
+        Returns
+        -------
+        results_dict: dict storing lca dataframe for selected scenario, period, location
+        """
+        
         if self.df_results is None:
             print("results has not been generated")
             return
@@ -218,6 +283,7 @@ class Elec_LCA:
         return results_dict
 
     def get_all_results(self):
+        """ get all the combined scenarios, years, locations results dataframe """
         if self.df_results is None:
             print("results has not been generated")
             return
