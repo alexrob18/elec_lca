@@ -6,3 +6,4 @@ datapackage
 wurst
 brightway25
 pathlib
+bw_processing
