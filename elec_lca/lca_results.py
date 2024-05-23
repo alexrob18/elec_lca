@@ -55,5 +55,5 @@ def tech_array(df_scenarios, tech):
     (numpy array) technology market shares over the different scenarios and time steps
     '''
     df_scenarios = df_scenarios.sort_values(by=['scenario, period']) # order the table according to scenarios and time steps
-    arr = df_scenarios[df_scenarios.technology == tech].to_numpy()
+    arr = df_scenarios[df_scenarios.technology == tech].values.to_numpy()
     return arr
