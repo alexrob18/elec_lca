@@ -1,15 +1,25 @@
+import pandas as pd
 import wurst
 import bw2data
 import uuid
+from pathlib import Path
+import pkg_resources
 
-def mapping(df_mapping, tech, location):
+
+def mapping(tech, location, mapping_filepath=None):
     '''
     Performs mapping between energy technologies names and ecoinvent LCI datasets
-    :param df_mapping: (pandas Dataframe) mapping between energy technologies names and ecoinvent LCI datasets
     :param tech: (str) name of the energy technology
     :param location: (str) ecoinvent location code
+    :param mapping_filepath: (str) path to mapping between energy technologies names and ecoinvent LCI datasets
     :return: Python dictionary of the technology LCI dataset containing the name, product and location as strings.
     '''
+
+    if mapping_filepath is None:
+        mapping_filepath = Path(pkg_resources.resource_stream(__name__, "__init__.py").name).parent.parent /\
+                     "data/mappings/mapping_technologies_ecoinvent.csv"
+    df_mapping = pd.read_csv(mapping_filepath)
+
     name = df_mapping[df_mapping['Technology name'] == tech].activity_name.iloc[0]
     product = df_mapping[df_mapping['Technology name'] == tech].product_name.iloc[0]
 
@@ -51,13 +61,13 @@ def searching_dataset(database, act_dict):
     return ds
 
 
-def new_electricity_market(database, location, df_scenario, df_mapping):
+def new_electricity_market(database, location, df_scenario, mapping_filepath=None):
     '''
     Creates a new database into which the electricity mix (high voltage) is replaced by the one specified by the user.
     :param database: wurst database
     :param location: (str) ecoinvent location code
     :param df_scenario: (pandas Dataframe) dataframe of an energy scenario, containing the shares (value column) for each energy technology (technology column)
-    :param df_mapping: (pandas Dataframe) mapping between energy technologies names and ecoinvent LCI datasets
+    :param mapping_filepath: (str) path to mapping between energy technologies names and ecoinvent LCI datasets
     :return: (wurst dataset) the newly created electricity mix dataset
     '''
     name_database = database[0]['database']
@@ -75,7 +85,8 @@ def new_electricity_market(database, location, df_scenario, df_mapping):
     tech_list = list(df_scenario.technology.unique()) # list of technologies involved in the scenario
 
     for tech in tech_list: # create the list of exchanges (i.e., shares of the electricity mix)
-        ds = searching_dataset(database=database, act_dict=mapping(df_mapping=df_mapping, tech=tech, location=location))
+        ds = searching_dataset(database=database, act_dict=mapping(tech=tech, location=location,
+                                                                   mapping_filepath=mapping_filepath))
         exc = {
             'amount': float(df_scenario[df_scenario.technology == tech].value.iloc[0]),
             'type': 'technosphere',
