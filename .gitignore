@@ -38,6 +38,9 @@ MANIFEST
 pip-log.txt
 pip-delete-this-directory.txt
 
+# local files
+dev/ei391.pickle
+
 # Unit test / coverage reports
 htmlcov/
 .tox/
