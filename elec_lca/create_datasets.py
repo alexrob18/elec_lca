@@ -98,6 +98,19 @@ def new_electricity_market(database, location, df_scenario, mapping_filepath=Non
         }
         exchanges.append(exc)
 
+    # Add everything that is in high voltage but is not a technology
+    ds = searching_dataset(
+        database=database,
+        act_dict={
+            "name": "market for electricity, high voltage",
+            "reference product": "electricity, high voltage",
+            "location": location,
+        }
+    )
+    for x in ds["exchanges"]:
+        if x["type"] == "technosphere" and x["unit"] != "kilowatt hour":
+            exchanges.append(x)
+
     ds_mix = {
         'database': name_database,
         'code': uuid.uuid4().hex,
