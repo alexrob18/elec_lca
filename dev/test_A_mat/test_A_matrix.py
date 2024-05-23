@@ -49,10 +49,10 @@ class get_A_matrix_elec_scn_array:
         get_indice_from_A = lca.activity_dict[elec_act]  # for BW2 
         return (dp_A, get_indice_from_A)
 
+    
     def convert_techx_to_bw2act (self, act_tech): 
         # need some mapping
         return techx_bw2act
-        
     
     def get_coeff_for_tech_elec(self, act_tech, act_elec):
         '''
@@ -87,6 +87,7 @@ class get_A_matrix_elec_scn_array:
         get_elec_array_indice = np.array(get_elec_array, dtype=bwp.INDICES_DTYPE) 
         return (get_elec_array_indice)
     
+
     def get_elec_array_value_for_Scn_x_Year_t(self ): 
         """ 
         output: 
@@ -100,7 +101,6 @@ class get_A_matrix_elec_scn_array:
     def get_final_elec_A_array_for_Scn_x_Year_t(self): 
         """ 
         """ 
-        get_indice_from_A = self.get_indice_from_A
         get_elec_array_indice = self.get_elec_array_indice
         get_elec_mix_data = self.get_elec_mix_data
 
@@ -109,7 +109,7 @@ class get_A_matrix_elec_scn_array:
         elec_scn_arr.add_persistent_array(
             matrix='technosphere_matrix',
             indices_array=np.array([
-                    get_indice_from_A, # elec_mix indice for scn / Year
+                    get_elec_array_indice, # elec_mix indice for scn / Year
                 ], 
                 dtype=bwp.INDICES_DTYPE
             ),
