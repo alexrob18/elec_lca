@@ -3,7 +3,13 @@ import bw2data
 import uuid
 
 def mapping(df_mapping, tech, location):
-
+    '''
+    Performs mapping between energy technologies names and ecoinvent LCI datasets
+    :param df_mapping: (pandas Dataframe) mapping between energy technologies names and ecoinvent LCI datasets
+    :param tech: (str) name of the energy technology
+    :param location: (str) ecoinvent location code
+    :return: Python dictionary of the technology LCI dataset containing the name, product and location as strings.
+    '''
     name = df_mapping[df_mapping['Technology name'] == tech].activity_name.iloc[0]
     product = df_mapping[df_mapping['Technology name'] == tech].product_name.iloc[0]
 
@@ -17,7 +23,12 @@ def mapping(df_mapping, tech, location):
 
 
 def searching_dataset(database, act_dict):
-
+    '''
+    Search and returns an activity within a wurst database.
+    :param database: wurst database
+    :param act_dict: dictionary of the activity, containing at least the name, product and location as strings.
+    :return: wurst dataset
+    '''
     act_filter = [
         wurst.searching.equals("name", act_dict['name']),
         wurst.searching.equals("reference product", act_dict['reference product']),
@@ -41,7 +52,14 @@ def searching_dataset(database, act_dict):
 
 
 def new_electricity_market(database, location, df_scenario, df_mapping):
-
+    '''
+    Creates a new database into which the electricity mix (high voltage) is replaced by the one specified by the user.
+    :param database: wurst database
+    :param location: (str) ecoinvent location code
+    :param df_scenario: (pandas Dataframe) dataframe of an energy scenario, containing the shares (value column) for each energy technology (technology column)
+    :param df_mapping: (pandas Dataframe) mapping between energy technologies names and ecoinvent LCI datasets
+    :return: (wurst dataset) the newly created electricity mix dataset
+    '''
     name_database = database[0]['database']
 
     exchanges = [{
