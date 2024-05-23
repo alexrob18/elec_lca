@@ -10,7 +10,7 @@ from .lcia import get_lcia_methods
 DIR_DATAPACKAGE_TEMP = Path.cwd() / "export" / "temp"
 DIR_DATAPACKAGE = Path.cwd() / "export" / "datapackage"
 DATA_DIR = Path(__file__).parent / "data"
-LCIA_METHODS = DATA_DIR / "lcia_data_old.json"
+LCIA_METHODS = DATA_DIR / "lcia_data.json"
 
 
 
