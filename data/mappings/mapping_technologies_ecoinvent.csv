@@ -8,8 +8,8 @@ Geothermal energy,"electricity, high voltage","electricity production, deep geot
 Storage dam,"electricity, high voltage","electricity production, hydro, reservoir, non-alpine region",/kWh
 Run-of-river,"electricity, high voltage","electricity production, hydro, run-of-river",/kWh
 Conventional nuclear,"electricity, high voltage","electricity production, nuclear, pressure water reactor",/kWh
-Offshore wind turbines,"electricity, high voltage","electricity production, wind, 1-3MW turbine, offshore",/kWh
-Onshore wind turbines,"electricity, high voltage","electricity production, wind, 1-3MW turbine, onshore",/kWh
+Offshore turbines,"electricity, high voltage","electricity production, wind, 1-3MW turbine, offshore",/kWh
+Onshore turbines,"electricity, high voltage","electricity production, wind, 1-3MW turbine, onshore",/kWh
 Heavy fuel oil
 Hydrogen
 Landfill gases
