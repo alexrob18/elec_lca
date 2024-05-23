@@ -2,15 +2,11 @@ numpy
 pandas
 pyyaml
 schema
-premise
 datapackage
 wurst
-jupyterlab
-notebook
 brightway25
-openpyxl
-warnings
 pathlib
 bw_graph_tools
 panel
 plotly
+bw_processing
