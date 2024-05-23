@@ -42,7 +42,7 @@ def get_coeff(code_act_1, code_act_2, database):
     return A[lca.dicts.activity[id_1], lca.dicts.activity[id_2]]
 
 
-def get_elec_A_mat_indice_for_Scn_x_Year_t(elec_act):
+def get_elec_A_mat_indice_for_Scn_x_Year_t(bc, elec_act):
     """
     to get the elec_act to get the A matrix per user_scn, user_yr
 
@@ -64,7 +64,7 @@ def get_elec_A_mat_indice_for_Scn_x_Year_t(elec_act):
     dp_A = lca.technosphere_matrix
     # for BW25: lca.dicts.activity[bd.get_id((database_name, code_act))]
     get_indice_from_A = lca.dicts.activity[elec_act]  # for BW2
-    return get_indice_from_A
+    return dp_A, get_indice_from_A
 
 
 def get_elec_impact(
@@ -86,6 +86,8 @@ def get_elec_impact(
     -------
 
     """
+
+
     lca = bc.LCA(
         demand={activity: 1},
         data_objs=[datapackage, elec_scn_arr],

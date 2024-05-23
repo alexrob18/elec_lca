@@ -1,10 +1,13 @@
-import pandas
 import pandas as pd
+import numpy as np
+import bw_processing as bwp
+import matrix_utils as mu
+import bw2calc as bc
 
 from elec_lca.reading import read_user_input_template_excel_file
 from elec_lca.create_datasets import new_electricity_market
 from elec_lca.create_user_input_file import create_user_input_file
-from elec_lca.lca_results import get_elec_impact
+from elec_lca.lca_results import get_elec_impact, get_elec_A_mat_indice_for_Scn_x_Year_t
 
 
 class Elec_LCA:
@@ -17,9 +20,11 @@ class Elec_LCA:
     df_scenario = None
     original_database = None
     modified_database = {}
-    array_to_modify = {}
+    index_array_to_modify = None
+    data_array_to_modify = {}
     mapping_filepath = None
     df_results = None
+    scenario_mapping = None # tuple (scenario, period)
 
     def __init__(self, original_database):
         self.original_database = original_database
@@ -88,7 +93,8 @@ class Elec_LCA:
             ).set_index(["scenario", "period"])
 
             self.modified_database[loc] = modified_dataset.copy()
-            self.array_to_modify[loc] = df_of_modified_scenario
+            self
+            self.data_array_to_modify[loc] = df_of_modified_scenario.to_numpy()
 
     def view_available_location(self):
         print("This object contains modified dataset for the following location:")
@@ -109,16 +115,40 @@ class Elec_LCA:
 
         results_list = []
 
-        for loc in self.modified_database.keys():
-            for (scn, per) in self.array_to_modify[loc]:
-                elec_scn_arr = None
-                for impact_method in impact_method_list:
-                    score = get_elec_impact(
-                                self.modified_database[loc],
-                                elec_scn_arr,
-                                impact_method,
-                                activity='market for electricity, low voltage'
-                            )
+        for impact_method in impact_method_list:
+            for loc in self.modified_database.keys():
+
+                dp_scenarios = bwp.create_datapackage(combinatorial=True)
+                dp_scenarios.add_persistent_array(
+                        matrix='technosphere_matrix',
+                        indices_array=self.index_array_to_modify,
+                        data_array=np.array(self.data_array_to_modify[loc]),  # reduce cf consumption
+                        flip_array=np.array([False]),
+                        name='cf scenario'
+                    )
+
+                lca = bc.LCA(
+                    demand={'market for electricity, low voltage': 1},
+                    data_objs=[self.modified_database[loc], dp_scenarios],
+                    use_arrays=True,
+                )
+                lca.lci()
+                lca.lcia()
+
+                resource_group = next(grp for grp in lca.technosphere_mm.groups).indexer.indexer
+                res = pd.DataFrame(columns=["location", "period", "scenario"] + impact_method_list)
+                res["location"] = [loc]
+                res["period"] = per
+                res["scenario"] = scn
+                for method in impact_method_list:
+                    res[method] = 0 if method != impact_method else score
+                results_list.append(res.copy())
+                print(lca.score, scenario_mapping[resource_group.index])
+                print("test")
+                for scenario_result in lca:
+                    print(lca.score, scenario_mapping[resource_group.index])
+
+
                     res = pd.DataFrame(columns=["location", "period", "scenario"] + impact_method_list)
                     res["location"] = [loc]
                     res["period"] = per
