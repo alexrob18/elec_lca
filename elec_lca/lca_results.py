@@ -1,5 +1,7 @@
 import bw2calc as bc
 import bw2data as bd
+import pandas as pd
+import numpy as np
 
 def get_A_index(code_act, database):
     '''
@@ -39,3 +41,19 @@ def get_coeff(code_act_1, code_act_2, database):
     A = lca.technosphere_matrix
 
     return A[lca.dicts.activity[id_1], lca.dicts.activity[id_2]]
+
+
+def tech_array(df_scenarios, tech):
+    '''
+    Parameters
+    ----------
+    df_scenarios: (pandas Dataframe) dataframe of energy scenarios
+    tech: (str) name of the energy technology
+
+    Returns
+    -------
+    (numpy array) technology market shares over the different scenarios and time steps
+    '''
+    df_scenarios = df_scenarios.sort_values(by=['scenario, period']) # order the table according to scenarios and time steps
+    arr = df_scenarios[df_scenarios.technology == tech].to_numpy()
+    return arr
