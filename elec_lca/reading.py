@@ -45,7 +45,7 @@ def read_user_input_template_excel_file(
 
     # Iterate over all the sheets that contain inputs
     for sheet_name in workbook.sheetnames:
-        if sheet_name not in ["README", "Dropdown_list", "default_dataset", "mapping", "Input_template"]:
+        if sheet_name not in ["README", "Dropdown_list", "default_dataset", "Input_template", "mapping"]:
             sheet = workbook[sheet_name]
             # Get scenario name and location
             scn_name = sheet['C7'].value
@@ -55,8 +55,19 @@ def read_user_input_template_excel_file(
 
             # Read information and store in DataFrame
             df = range_to_df(sheet["I5:{}".format(last_cell)])
+
+            # Remove empty rows
+            df.set_index('Technology list', inplace=True)
+            df.dropna(axis=0, how='all', inplace=True, subset=df.columns)
+
+            # Check if there are some rows left. If not, skip this sheet.
+            if len(df.index) <= 0:
+                continue
+            df.reset_index(inplace=True)
+
             # Format the DataFrame
-            df = pd.melt(df, id_vars=["Technology list"], var_name="period")
+            df = pd.melt(df, id_vars=["Technology list"], var_name="period").copy()
+            df["value"] = df["value"].fillna(0)
             df.rename(columns={"Technology list": "technology"}, inplace=True)
             df["scenario"] = scn_name
             df["location"] = location
@@ -65,6 +76,8 @@ def read_user_input_template_excel_file(
             list_df.append(df)
 
     # Concatenate all the DataFrames
+    if len(list_df) == 0:
+        raise ValueError("No data was provided.")
     df_total = pd.concat(list_df, axis=1)
 
     # Check input data format

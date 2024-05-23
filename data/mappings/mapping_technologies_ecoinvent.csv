@@ -1,12 +1,19 @@
 Technology name,product_name,activity_name,unit
-Centralized Solar Photovoltaic,"electricity, low voltage","electricity production, photovoltaic, 570kWp open ground installation, multi-Si",/kWh
-Coal Power Plant,"electricity, high voltage","electricity production, hard coal",/kWh
-Co-generation from wood,"electricity, high voltage","heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014",/kWh
+Centralized photovoltaic panels,"electricity, low voltage","electricity production, photovoltaic, 570kWp open ground installation, multi-Si",/kWh
+Coal,"electricity, high voltage","electricity production, hard coal",/kWh
+Wood,"electricity, high voltage","heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014",/kWh
 Combined Cycle Gas Turbine,"electricity, high voltage","electricity production, natural gas, combined cycle power plant",/kWh
-Decentralized Solar Photovoltaic,"electricity, low voltage","electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",/kWh
-Geothermal Energy,"electricity, high voltage","electricity production, deep geothermal",/kWh
-Hydroelectric Dam,"electricity, high voltage","electricity production, hydro, reservoir, non-alpine region",/kWh
-Hydroelectric River,"electricity, high voltage","electricity production, hydro, run-of-river",/kWh
-Nuclear,"electricity, high voltage","electricity production, nuclear, pressure water reactor",/kWh
-Wind Energy Offshore,"electricity, high voltage","electricity production, wind, 1-3MW turbine, offshore",/kWh
-Wind Energy Onshore,"electricity, high voltage","electricity production, wind, 1-3MW turbine, onshore",/kWh
+Decentralized photovoltaic panels,"electricity, low voltage","electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",/kWh
+Geothermal energy,"electricity, high voltage","electricity production, deep geothermal",/kWh
+Storage dam,"electricity, high voltage","electricity production, hydro, reservoir, non-alpine region",/kWh
+Run-of-river,"electricity, high voltage","electricity production, hydro, run-of-river",/kWh
+Conventional nuclear,"electricity, high voltage","electricity production, nuclear, pressure water reactor",/kWh
+Offshore wind turbines,"electricity, high voltage","electricity production, wind, 1-3MW turbine, offshore",/kWh
+Onshore wind turbines,"electricity, high voltage","electricity production, wind, 1-3MW turbine, onshore",/kWh
+Heavy fuel oil
+Hydrogen
+Landfill gases
+Light fuel oil
+Natural gas
+Small modular reactor
+Tidal energy
