@@ -29,8 +29,14 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
-    # dependencies as strings with quotes, e.g. "foo"
-    # You can add version requirements like "foo>2.0"
+    "numpy",
+    "pandas",
+    "pyyaml",
+    "schema",
+    "datapackage",
+    "wurst",
+    "brightway25",
+    "pathlib",
 ]
 
 [project.urls]

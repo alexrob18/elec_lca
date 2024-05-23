@@ -2,12 +2,7 @@ numpy
 pandas
 pyyaml
 schema
-premise
 datapackage
 wurst
-jupyterlab
-notebook
 brightway25
-openpyxl
-warnings
 pathlib
