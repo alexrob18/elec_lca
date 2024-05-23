@@ -17,20 +17,22 @@ class Elec_LCA:
 
     """
 
+    methode_family = None # type of methods
+    method_list = None # exact list of methods
+
+    original_database = None
+    modified_datapack = {}
+    tech_dict = {}
+    bio_dict = {}
     user_input_location_dir = None
     user_input_location_filename = None
     df_scenario = None
-    original_database = None
-    modified_database = {}
-    tech_dict = {}
-    bio_dict = {}
+    list_of_df_scenario = {}
     index_array_to_modify = None
     data_array_to_modify = {}
     mapping_filepath = None
     df_results = None
     scenario_mapping = None # tuple (scenario, period)
-    method_list = None
-    methode_family = None
 
     def __init__(self, original_database, methode_family):
         self.original_database = original_database
@@ -104,7 +106,7 @@ class Elec_LCA:
         location_list = scn_df["location"].unique().tolist()
 
         for loc in location_list:
-            if loc in self.modified_database.keys() and not overwrite_data_set:
+            if loc in self.modified_datapack.keys() and not overwrite_data_set:
                 print(f"Skipping location {loc}, since there is already a dataset with this location.\n "
                       "To overwrite the dataset, set the argument 'overwrite_data_set' to true")
 
@@ -118,7 +120,7 @@ class Elec_LCA:
                 mapping_filepath=self.mapping_filepath
             )
 
-            self.modified_database[loc] = modified_dataset.copy()
+            self.modified_datapack[loc] = modified_dataset.copy()
             self.tech_dict[loc] = tech_dict.copy()
             self.bio_dict[loc] = bio_dict.copy()
 
@@ -128,7 +130,7 @@ class Elec_LCA:
             ).set_index(["scenario", "period"])
 
             self.scenario_mapping = {idx: name for idx, name in enumerate(df_of_modified_scenario.index.to_list)}
-            self.data_array_to_modify[loc] = df_of_modified_scenario.to_numpy()
+            self.list_of_df_scenario[loc] = df_of_modified_scenario
 
     def view_available_location(self):
         print("This object contains modified dataset for the following location:")
@@ -150,20 +152,23 @@ class Elec_LCA:
         results_list = []
 
         for impact_method in self.method_list:
-            for loc in self.modified_database.keys():
+            for loc in self.modified_datapack.keys():
+
+                current_datapack = self.modified_datapack[loc][impact_method]
+                current_tech_dict = self.tech_dict[loc]
 
                 dp_scenarios = bwp.create_datapackage(combinatorial=True)
                 dp_scenarios.add_persistent_array(
                         matrix='technosphere_matrix',
                         indices_array=self.index_array_to_modify,
-                        data_array=np.array(self.data_array_to_modify[loc]),  # reduce cf consumption
+                        data_array=np.array(self.data_array_to_modify[loc]),
                         flip_array=np.array([False]),
                         name='cf scenario'
                     )
 
                 lca = bc.LCA(
-                    demand={'market for electricity, low voltage': 1},
-                    data_objs=[self.modified_database[loc][impact_method], dp_scenarios],
+                    demand={'market for electricity, high voltage': 1},
+                    data_objs=[current_datapack, dp_scenarios],
                     use_arrays=True,
                 )
                 lca.lci()
