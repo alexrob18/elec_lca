@@ -13,17 +13,17 @@ warnings.filterwarnings(
 
 
 def read_user_input_template_excel_file(
-        user_input_directory="../data",
-        user_input_template_filename="user_input_template.xlsm",
+        user_input_directory,
+        user_input_template_filename="Elec_lca_user_input.xlsm",
 ):
     """Function that reads the user input excel template file filed out by the user and returns the information
     stored in a DataFrame.
 
     Parameters
     ----------
-    user_input_directory: str or pathlib.Path, default="../data"
+    user_input_directory: str or pathlib.Path"
         Name of the directory where the Excel file that contains the input data from the user is located.
-    user_input_template_filename: str, default="user_input_template.xlsm"
+    user_input_template_filename: str, default="Elec_lca_user_input.xlsm"
         Name of the input Excel file that contains the input data from the user.
 
     Returns
@@ -45,7 +45,7 @@ def read_user_input_template_excel_file(
 
     # Iterate over all the sheets that contain inputs
     for sheet_name in workbook.sheetnames:
-        if sheet_name not in ["README", "Dropdown_list", "default_dataset", "Input_template"]:
+        if sheet_name not in ["README", "Dropdown_list", "default_dataset", "mapping", "Input_template"]:
             sheet = workbook[sheet_name]
             # Get scenario name and location
             scn_name = sheet['C7'].value
@@ -55,7 +55,6 @@ def read_user_input_template_excel_file(
 
             # Read information and store in DataFrame
             df = range_to_df(sheet["I5:{}".format(last_cell)])
-
             # Format the DataFrame
             df = pd.melt(df, id_vars=["Technology list"], var_name="period")
             df.rename(columns={"Technology list": "technology"}, inplace=True)
