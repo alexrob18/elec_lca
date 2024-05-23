@@ -13,17 +13,17 @@ warnings.filterwarnings(
 
 
 def read_user_input_template_excel_file(
-        user_input_directory="../data",
-        user_input_template_filename="user_input_template.xlsm",
+        user_input_directory,
+        user_input_template_filename="Elec_lca_user_input.xlsm",
 ):
     """Function that reads the user input excel template file filed out by the user and returns the information
     stored in a DataFrame.
 
     Parameters
     ----------
-    user_input_directory: str or pathlib.Path, default="../data"
+    user_input_directory: str or pathlib.Path"
         Name of the directory where the Excel file that contains the input data from the user is located.
-    user_input_template_filename: str, default="user_input_template.xlsm"
+    user_input_template_filename: str, default="Elec_lca_user_input.xlsm"
         Name of the input Excel file that contains the input data from the user.
 
     Returns
