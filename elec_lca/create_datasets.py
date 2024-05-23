@@ -72,71 +72,89 @@ def new_electricity_market(database, location, df_scenario, mapping_filepath=Non
     '''
     name_database = database[0]['database']
 
-    exchanges = [{
-        'amount': 1.0,
-        'type': 'production',
-        'name': 'market for electricity, high voltage',
-        'database': name_database,
-        'product': 'electricity, high voltage',
-        'unit': 'kilowatt hour',
-        'location': location
-    }] # list of exchanges of the electricity market
+    tech_list = list(df_scenario.technology.unique())  # list of technologies involved in the scenario
+    act_dict_all_techs = {}
+    dict_market_type_techs = {}
+    for tech in tech_list:
+        act_dict_all_techs[tech] = mapping(tech=tech, location=location, mapping_filepath=mapping_filepath)
+        reference_product = act_dict_all_techs[tech]["reference product"]
+        if reference_product in dict_market_type_techs.keys():
+            dict_market_type_techs[reference_product].append(tech)
+        else:
+            dict_market_type_techs[reference_product] = [tech]
 
-    tech_list = list(df_scenario.technology.unique()) # list of technologies involved in the scenario
-
-    for tech in tech_list: # create the list of exchanges (i.e., shares of the electricity mix)
-        ds = searching_dataset(database=database, act_dict=mapping(tech=tech, location=location,
-                                                                   mapping_filepath=mapping_filepath))
-        exc = {
-            'amount': float(df_scenario[df_scenario.technology == tech].value.iloc[0]),
-            'type': 'technosphere',
-            'name': ds['name'],
+    list_ds_mix = []
+    for market_type in dict_market_type_techs.keys():
+        exchanges = [{
+            'amount': 1.0,
+            'type': 'production',
+            'name': 'market for {}'.format(market_type),
             'database': name_database,
-            'product': ds['reference product'],
-            'unit': ds['unit'],
-            'location': ds['location']
+            'product': market_type,
+            'unit': 'kilowatt hour',
+            'location': location
+        }] # list of exchanges of the electricity market
+
+        for tech in dict_market_type_techs[market_type]: # create the list of exchanges (i.e., shares of the electricity mix)
+            ds = searching_dataset(database=database, act_dict=act_dict_all_techs[tech])
+            exc = {
+                'amount': float(df_scenario[df_scenario.technology == tech].value.iloc[0]),
+                'type': 'technosphere',
+                'name': ds['name'],
+                'database': name_database,
+                'product': ds['reference product'],
+                'unit': ds['unit'],
+                'location': ds['location']
+            }
+            exchanges.append(exc)
+
+        # Add everything that is in high voltage but is not a technology
+        ds = searching_dataset(
+            database=database,
+            act_dict={
+                "name": "market for {}".format(market_type),
+                "reference product": market_type,
+                "location": location,
+            }
+        )
+        for x in ds["exchanges"]:
+            if x["type"] == "technosphere" and x["unit"] != "kilowatt hour":
+                exchanges.append(x)
+            if (
+                    market_type == "electricity, low voltage"
+                    and x["type"] == "technosphere"
+                    and x["unit"] == "kilowatt hour"
+                    and "electricity production, photovoltaic" not in x["name"]
+            ):
+                exchanges.append(x)
+
+        ds_mix = {
+            'database': name_database,
+            'code': uuid.uuid4().hex,
+            'name': 'market for {}'.format(market_type),
+            'reference product': market_type,
+            'location': location,
+            'unit': 'kilowatt hour',
+            'classifications': [('ISIC rev.4 ecoinvent', '3510:Electric power generation, transmission and distribution'),
+                                ('EcoSpold01Categories', 'hard coal/power plants'),
+                                ('CPC', '17100: Electrical energy')],
+            'categories': None,
+            'comment': 'user-defined market {}'.format(market_type),
+            'parameters': {},
+            'exchanges': exchanges
         }
-        exchanges.append(exc)
 
-    # Add everything that is in high voltage but is not a technology
-    ds = searching_dataset(
-        database=database,
-        act_dict={
-            "name": "market for electricity, high voltage",
-            "reference product": "electricity, high voltage",
-            "location": location,
-        }
-    )
-    for x in ds["exchanges"]:
-        if x["type"] == "technosphere" and x["unit"] != "kilowatt hour":
-            exchanges.append(x)
+        # Take the current database, and removes the market for electricity high voltage for the given location
+        database = [a for a in database if (a["name"], a["reference product"], a["location"]) not in [
+            ("market for {}".format(market_type), market_type, location)
+        ]
+              ]
 
-    ds_mix = {
-        'database': name_database,
-        'code': uuid.uuid4().hex,
-        'name': 'market for electricity, high voltage',
-        'reference product': 'electricity, high voltage',
-        'location': location,
-        'unit': 'kilowatt hour',
-        'classifications': [('ISIC rev.4 ecoinvent', '3510:Electric power generation, transmission and distribution'),
-                            ('EcoSpold01Categories', 'hard coal/power plants'),
-                            ('CPC', '17100: Electrical energy')],
-        'categories': None,
-        'comment': 'user-defined market electricity, high voltage',
-        'parameters': {},
-        'exchanges': exchanges
-    }
-
-    # Take the current database, and removes the market for electricity high voltage for the given location
-    db = [a for a in database if (a["name"], a["reference product"], a["location"]) not in [
-        ("market for electricity, high voltage", "electricity, high voltage", location)
-    ]
-          ]
-
-    db.append(ds_mix) # add the new electricity market to the database
+        database.append(ds_mix) # add the new electricity market to the database
+        list_ds_mix.append(ds_mix)
 
     if f'ecoinvent_updated_electricity_mix_{location}' in bw2data.databases:
         del bw2data.databases[f'ecoinvent_updated_electricity_mix_{location}']
-    wurst.write_brightway2_database(db, f'ecoinvent_updated_electricity_mix_{location}') # write new database in brightway
+    wurst.write_brightway2_database(database, f'ecoinvent_updated_electricity_mix_{location}') # write new database in brightway
 
-    return ds_mix
+    return list_ds_mix
