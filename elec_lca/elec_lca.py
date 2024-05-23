@@ -106,7 +106,6 @@ class Elec_LCA:
         """
 
         results_list = []
-        # pd.DataFrame(columns=["location", "period", "scenario"] + impact_method_list)
 
         for loc in self.modified_database.keys():
             for (scn, per) in self.array_to_modify[loc]:
@@ -126,19 +125,33 @@ class Elec_LCA:
                         res[method] = 0 if method != impact_method else score
                     results_list.append(res.copy())
 
-        self.df_results = pd.concat(results_list, axis=0)
+        self.df_results = pd.concat(results_list, axis=0).set_index(["location", "period", "scenario"])
 
-    # def get_specific_results(self, scenario, period, location):
-    #     if self.df_results is None:
-    #         print("results has not been generated")
-    #         return
-    #
-    #     quit_flag =
-    #     if location not in self.df_results["location"].unique().tolist():
-    #         print("No input were provided for target location")
-    #     if period not in self.df_results["period"].unique().tolist():
-    #         print("No input were provided for target period")
-    #     if scenario not in self.df_results["scenario"].unique().tolist():
-    #         print("No input were provided for target scenario")
+    def get_specific_results(self, scenario, period, location):
+        if self.df_results is None:
+            print("results has not been generated")
+            return
 
+        if (location, period, scenario) not in self.df_results.index.tolist():
+            print("No input were provided for target scenario, period, location")
+            return
+
+        temp_res = self.df_results.copy()
+        temp_res = temp_res[(temp_res["scenario"] == scenario)
+                            & (temp_res["period"] == period)
+                            % (temp_res["location"] == location)]
+
+        results_dict = {}
+        for col in self.df_results.copy():
+            results_dict[col] = self.df_results.at[(location, period, scenario), col]
+
+        print(results_dict)
+        return results_dict
+
+    def get_all_results(self):
+        if self.df_results is None:
+            print("results has not been generated")
+            return
+
+        return self.df_results
 
