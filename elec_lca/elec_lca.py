@@ -24,6 +24,7 @@ class Elec_LCA:
     def __init__(self, original_database):
         self.original_database = original_database
 
+    # load Data
     def load_custom_mapping_to_ei(self, mapping_filepath):
 
         self.mapping_filepath = mapping_filepath
@@ -63,6 +64,7 @@ class Elec_LCA:
         print("No user input as be given, no data has been loaded")
         return
 
+    # make calculation
     def create_new_location_dataset(self, overwrite_data_set=False):
 
         scn_df = self.df_scenario.copy()
@@ -127,6 +129,7 @@ class Elec_LCA:
 
         self.df_results = pd.concat(results_list, axis=0).set_index(["location", "period", "scenario"])
 
+    # get results
     def get_specific_results(self, scenario, period, location):
         if self.df_results is None:
             print("results has not been generated")
