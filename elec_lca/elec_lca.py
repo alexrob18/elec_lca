@@ -30,22 +30,26 @@ class Elec_LCA:
     
     """
 
+    user_input_location_dir = None
+    user_input_location_filename = None
+    mapping_filepath = None
+
     methode_family = None # type of methods
     method_list = None # exact list of methods
 
     original_database = None
     modified_datapack = {}
+    tech_map = {}
     tech_dict = {}
     bio_dict = {}
-    user_input_location_dir = None
-    user_input_location_filename = None
     df_scenario = None
-    list_of_df_scenario = {}
+
     index_array_to_modify = None
     data_array_to_modify = {}
-    mapping_filepath = None
-    df_results = None
+
+    list_of_df_scenario = {}
     scenario_mapping = None # tuple (scenario, period)
+    df_results = None
 
     def __init__(self, original_database, methode_family):
         self.original_database = original_database
@@ -74,19 +78,19 @@ class Elec_LCA:
 
     
     def load_custom_mapping_to_ei(self, mapping_filepath):
-    """     locate the technology mapping file , doesn't return anything  """
+        """     locate the technology mapping file , doesn't return anything  """
         self.mapping_filepath = mapping_filepath
 
 
     def create_input_file(self, output_directory):
-    """ 
-    create an input_file, 
-    prepare: user_input_location_dir and user_input_location_filename
-    
-    Parameters
-    ----------
-    output_directory: the user's output directory in the local drive 
-    """
+        """
+        create an input_file,
+        prepare: user_input_location_dir and user_input_location_filename
+
+        Parameters
+        ----------
+        output_directory: the user's output directory in the local drive
+        """
         
         filepath = create_user_input_file(
             output_directory,
@@ -160,7 +164,7 @@ class Elec_LCA:
 
             self.prepare_method_list(self.methode_family)
 
-            modified_dataset, tech_dict, bio_dict = new_electricity_market(
+            modified_dataset, tech_dict, bio_dict, tech_map = new_electricity_market(
                 self.original_database,
                 loc,
                 scn_df[scn_df["location"] == loc].copy(),
@@ -170,14 +174,15 @@ class Elec_LCA:
 
             self.modified_datapack[loc] = modified_dataset.copy()
             self.tech_dict[loc] = tech_dict.copy()
+            self.tech_map[loc] = tech_map.copy()
             self.bio_dict[loc] = bio_dict.copy()
 
             df_of_modified_scenario = scn_df[scn_df["location"] == loc].copy()
             df_of_modified_scenario = df_of_modified_scenario.pivot_table(
                 values="value", index=["scenario", "period"], columns="technology", aggfunc='sum'
-            ).set_index(["scenario", "period"])
+            )
 
-            self.scenario_mapping = {idx: name for idx, name in enumerate(df_of_modified_scenario.index.to_list)}
+            self.scenario_mapping = {idx: name for idx, name in enumerate(df_of_modified_scenario.index.to_list())}
             self.list_of_df_scenario[loc] = df_of_modified_scenario
 
     def view_available_location(self):
@@ -208,7 +213,13 @@ class Elec_LCA:
                 current_datapack = self.modified_datapack[loc][impact_method]
                 current_tech_dict = self.tech_dict[loc]
 
-                dp_scenarios = bwp.create_datapackage(combinatorial=True)
+                self.index_array_to_modify = np.array([(self.tech_map[tech]["name"],
+                                                        self.tech_map[tech]["reference product"],
+                                                        self.tech_map[tech]["location"])
+                                                        for tech in self.list_of_df_scenario[loc].columns.to_list()],
+                                                      dtype=bwp.INDICES_DTYPE)
+
+                dp_scenarios = bwp.create_datapackage(combinatorial=True, sequential=True)
                 dp_scenarios.add_persistent_array(
                         matrix='technosphere_matrix',
                         indices_array=self.index_array_to_modify,

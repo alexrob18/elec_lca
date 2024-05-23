@@ -6,6 +6,7 @@ from pathlib import Path
 import pkg_resources
 import elec_lca
 
+from elec_lca.datapackage import create_datapackage
 
 def mapping(tech, location, mapping_filepath=None):
     '''
@@ -85,20 +86,25 @@ def new_electricity_market(database, location, df_scenario, methods, mapping_fil
     }] # list of exchanges of the electricity market
 
     tech_list = list(df_scenario.technology.unique()) # list of technologies involved in the scenario
-
+    tech_dict_used = {}
     for tech in tech_list: # create the list of exchanges (i.e., shares of the electricity mix)
-        ds = searching_dataset(database=database, act_dict=mapping(tech=tech, location=location,
-                                                                   mapping_filepath=mapping_filepath))
-        exc = {
-            'amount': float(df_scenario[df_scenario.technology == tech].value.iloc[0]),
-            'type': 'technosphere',
-            'name': ds['name'],
-            'database': name_database,
-            'product': ds['reference product'],
-            'unit': ds['unit'],
-            'location': ds['location']
-        }
-        exchanges.append(exc)
+        print(tech)
+        try:
+            temp_tech_dict = mapping(tech=tech, location=location, mapping_filepath=mapping_filepath)
+            tech_dict_used[tech] = temp_tech_dict.copy()
+            ds = searching_dataset(database=database, act_dict=temp_tech_dict)
+            exc = {
+                'amount': float(df_scenario[df_scenario.technology == tech].value.iloc[0]),
+                'type': 'technosphere',
+                'name': ds['name'],
+                'database': name_database,
+                'product': ds['reference product'],
+                'unit': ds['unit'],
+                'location': ds['location']
+            }
+            exchanges.append(exc)
+        except:
+            tech_list.remove(tech)
 
     # Add everything that is in high voltage but is not a technology
     ds = searching_dataset(
@@ -141,6 +147,6 @@ def new_electricity_market(database, location, df_scenario, methods, mapping_fil
     #     del bw2data.databases[f'ecoinvent_updated_electricity_mix_{location}']
     # wurst.write_brightway2_database(db, f'ecoinvent_updated_electricity_mix_{location}') # write new database in brightway
 
-    dps, tech_dict, bio_dict = elec_lca.datapackage.create_datapackage(database, methods=methods)
+    dps, tech_dict, bio_dict = create_datapackage(database, methods=methods)
 
-    return dps, tech_dict, bio_dict
+    return dps, tech_dict, bio_dict, tech_dict_used
