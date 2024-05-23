@@ -12,7 +12,7 @@ Offshore wind turbines,"electricity, high voltage","electricity production, wind
 Onshore wind turbines,"electricity, high voltage","electricity production, wind, 1-3MW turbine, onshore",/kWh
 Heavy fuel oil,"electricity, high voltage","heat and power co-generation, oil",/kWh
 Hydrogen,"electricity, high voltage","market for electricity, high voltage",/kWh
-Landfill gases,"electricity, medium voltage","treatment of waste packaging paper, sanitary landfill",/kWh
+Landfill gases,"electricity, medium voltage","treatment of sewage sludge, 75% water, WWT, WW, average, sanitary landfill",/kWh
 Light fuel oil,"electricity, high voltage","heat and power co-generation, oil",/kWh
 Natural gas,"electricity, high voltage","electricity production, natural gas, combined cycle power plant",/kWh
 Small modular reactor,"electricity, high voltage","electricity production, nuclear, pressure water reactor",/kWh
