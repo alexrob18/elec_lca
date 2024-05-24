@@ -18,7 +18,7 @@ the model essentially transform the whole background database once the user defi
 ## Output: 
 The transformed database will be stored in several ways: 
 - as a brightway2 datapackage 
-- as a wurst datapackage 
+- as a wurst datapackage
 - as a sparse technosphere matrix and additional_elec_arrays to be used for speeding up LCA calculation
 
 ## Interactive plots

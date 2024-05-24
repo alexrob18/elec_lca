@@ -13,6 +13,7 @@ maxdepth: 1
 ---
 self
 content/usage
+content/mapping
 content/api/index
 content/codeofconduct
 content/contributing

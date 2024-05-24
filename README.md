@@ -30,6 +30,9 @@ $ pip install elec_lca
 ## Objective
 To transform a whole background ecoinvent database (tested with v3.9.1 cutoff) through user-specified electricity market mix for a certain location, for user-defined scenario(s) and periods.
 
+## Documentation
+https://elec_lca.readthedocs.io/en/latest/
+
 ## Requirement
 <li>Users need to provide their own background database, the ecoinvent database is not included in this package.</li>
 <li>Required packages are given in <i>requirements.txt </i> Run the following commands to install the package: </li>
