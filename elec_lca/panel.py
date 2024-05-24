@@ -1,5 +1,3 @@
-from pathlib import Path
-import openpyxl
 import panel as pn
 import pandas as pd
 import plotly.graph_objs as go
@@ -7,7 +5,8 @@ from elec_lca.elec_lca import Elec_LCA
 
 elec_obj = Elec_LCA(database, "TRACI v2.1")
 
-def stacked_area_chart(df_scenarios):
+
+def stacked_area_chart(df_scenario):
 
     layout = go.Layout(
         paper_bgcolor='rgba(0,0,0,0)',
@@ -15,7 +14,6 @@ def stacked_area_chart(df_scenarios):
     )
 
     fig = go.Figure(layout=layout)
-    df_scenario = df_scenarios
     df_scenario = df_scenario.sort_values(by=['period'])
     tech_list = list(df_scenario.technology.unique())
     t = list(df_scenario.period.unique())
@@ -41,6 +39,7 @@ def stacked_area_chart(df_scenarios):
     fig.update_layout(hovermode="x unified")
 
     return fig
+
 
 pn.extension()
 
@@ -134,7 +133,7 @@ def show_inputs(event):
     start_year = widget_select_start_year.value
     end_year = widget_select_end_year.value
     location = widget_select_location.value
-    df_scns = elec_obj.df_scenarios
+    df_scns = elec_obj.df_scenario
     df_scns = df_scns[df_scns["scenario"] == scenario].copy()
     df_scns = df_scns[(df_scns["period"] >= start_year) & (df_scns["period"] <= end_year)].copy()
     df_scns = df_scns[df_scns["location"] == location].copy()
