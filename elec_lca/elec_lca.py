@@ -208,7 +208,7 @@ class Elec_LCA:
                         matrix='technosphere_matrix',
                         indices_array=self.index_array_to_modify[loc],
                         data_array=self.data_array_to_modify[loc],
-                        # flip_array=np.array([False for _ in range(len(self.index_array_to_modify[loc]))]),
+                        flip_array=np.array([True for _ in range(len(self.index_array_to_modify[loc]))]),
                         name='scenario'
                     )
 
