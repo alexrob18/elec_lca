@@ -1,5 +1,6 @@
 # elec_lca
 
+
 ```{button-link} https://docs.brightway.dev
 :color: info
 :expand:
@@ -12,6 +13,7 @@ hidden:
 maxdepth: 1
 ---
 self
+readme
 content/usage
 content/mapping
 content/api/index
