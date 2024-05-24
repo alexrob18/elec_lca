@@ -4,7 +4,7 @@ import bw2data
 import uuid
 from pathlib import Path
 import pkg_resources
-from .local_datapackage import create_datapackage
+from local_datapackage import create_datapackage
 
 
 def mapping(tech, location, mapping_filepath=None):

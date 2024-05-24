@@ -6,10 +6,10 @@ import bw2calc as bc
 import bw2data
 import json
 
-from .reading import read_user_input_template_excel_file
-from .create_datasets import new_electricity_market
-from .create_user_input_file import create_user_input_file
-from .lcia import get_lcia_method_names
+from reading import read_user_input_template_excel_file
+from create_datasets import new_electricity_market
+from create_user_input_file import create_user_input_file
+from lcia import get_lcia_method_names
 
 
 class Elec_LCA:
