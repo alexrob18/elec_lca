@@ -1,7 +1,10 @@
 import panel as pn
 import pandas as pd
 import plotly.graph_objs as go
-from elec_lca.elec_lca import Elec_LCA
+from elec_lca import Elec_LCA
+from caching import load_db
+
+database = load_db(r"C:\Users\RobertsonA\Desktop\ei391.pickle")
 
 elec_obj = Elec_LCA(database, "TRACI v2.1")
 
