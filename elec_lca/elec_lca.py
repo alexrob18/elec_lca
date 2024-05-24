@@ -6,10 +6,10 @@ import bw2calc as bc
 import bw2data
 import json
 
-from .reading import read_user_input_template_excel_file
-from .create_datasets import new_electricity_market
-from .create_user_input_file import create_user_input_file
-from .lcia import get_lcia_method_names
+from reading import read_user_input_template_excel_file
+from create_datasets import new_electricity_market
+from create_user_input_file import create_user_input_file
+from lcia import get_lcia_method_names
 
 
 class Elec_LCA:
@@ -208,7 +208,7 @@ class Elec_LCA:
                         matrix='technosphere_matrix',
                         indices_array=self.index_array_to_modify[loc],
                         data_array=self.data_array_to_modify[loc],
-                        # flip_array=np.array([False for _ in range(len(self.index_array_to_modify[loc]))]),
+                        flip_array=np.array([True for _ in range(len(self.index_array_to_modify[loc]))]),
                         name='scenario'
                     )
 

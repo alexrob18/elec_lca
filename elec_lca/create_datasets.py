@@ -4,7 +4,7 @@ import bw2data
 import uuid
 from pathlib import Path
 import pkg_resources
-from .local_datapackage import create_datapackage
+from local_datapackage import create_datapackage
 
 
 def mapping(tech, location, mapping_filepath=None):
@@ -89,7 +89,6 @@ def new_electricity_market(database, location, df_scenario, methods, mapping_fil
     tech_list = list(df_scenario.technology.unique()) # list of technologies involved in the scenario
     tech_dict_used = {}
     for tech in tech_list: # create the list of exchanges (i.e., shares of the electricity mix)
-        print(tech)
         # try:
         temp_tech_dict = mapping(tech=tech, location=location, mapping_filepath=mapping_filepath)
         ds = searching_dataset(database=database, act_dict=temp_tech_dict)
