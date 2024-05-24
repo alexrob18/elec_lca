@@ -9,13 +9,13 @@ import elec_lca
 from elec_lca.datapackage import create_datapackage
 
 def mapping(tech, location, mapping_filepath=None):
-    '''
+    """
     Performs mapping between energy technologies names and ecoinvent LCI datasets
     :param tech: (str) name of the energy technology
     :param location: (str) ecoinvent location code
     :param mapping_filepath: (str) path to mapping between energy technologies names and ecoinvent LCI datasets
     :return: Python dictionary of the technology LCI dataset containing the name, product and location as strings.
-    '''
+    """
 
     if mapping_filepath is None:
         mapping_filepath = Path(pkg_resources.resource_stream(__name__, "__init__.py").name).parent.parent /\
@@ -35,12 +35,12 @@ def mapping(tech, location, mapping_filepath=None):
 
 
 def searching_dataset(database, act_dict):
-    '''
+    """
     Search and returns an activity within a wurst database.
     :param database: wurst database
     :param act_dict: dictionary of the activity, containing at least the name, product and location as strings.
     :return: wurst dataset
-    '''
+    """
     act_filter = [
         wurst.searching.equals("name", act_dict['name']),
         wurst.searching.equals("reference product", act_dict['reference product']),
@@ -67,7 +67,7 @@ def searching_dataset(database, act_dict):
 
 
 def new_electricity_market(database, location, df_scenario, methods, mapping_filepath=None):
-    '''
+    """
     Creates a new database into which the electricity mix (high voltage) is replaced by the one specified by the user.
     :param database: wurst database
     :param location: (str) ecoinvent location code
@@ -75,7 +75,7 @@ def new_electricity_market(database, location, df_scenario, methods, mapping_fil
     :param methods: (list of str): impact assessment methods to consider
     :param mapping_filepath: (str) path to mapping between energy technologies names and ecoinvent LCI datasets
     :return: (datapackage) database datapackage
-    '''
+    """
     name_database = database[0]['database']
 
     tech_list = list(df_scenario.technology.unique())  # list of technologies involved in the scenario
