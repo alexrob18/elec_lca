@@ -9,6 +9,7 @@ import json
 from elec_lca.reading import read_user_input_template_excel_file
 from elec_lca.create_datasets import new_electricity_market
 from elec_lca.create_user_input_file import create_user_input_file
+from elec_lca.lcia import get_lcia_method_names
 from elec_lca.lca_results import get_elec_impact, get_elec_A_mat_indice_for_Scn_x_Year_t
 
 
@@ -56,26 +57,7 @@ class Elec_LCA:
         self.methode_family = methode_family
 
     def prepare_method_list(self, methode_family):
-        flows = []
-        methods = []
-        for m in list(bw2data.methods):
-            if m[0] == methode_family:
-                d = {"name": list(m), "exchanges": []}
-                method = bw2data.Method(m)
-                cfs = method.load()
-                for idx, val in cfs:
-                    act = bw2data.get_activity(idx)
-                    d["exchanges"].append({
-                        "name": act["name"],
-                        "categories": list(act["categories"]),
-                        "amount": val
-                    })
-                flows.append(d)
-                methods.append(m)
-        with open('../elec_lca/data/lcia_data.json', 'w') as f:
-            json.dump(flows, f)
-        self.method_list = [" - ".join(i) for i in methods]
-
+        self.method_list = get_lcia_method_names()
     
     def load_custom_mapping_to_ei(self, mapping_filepath):
         """     locate the technology mapping file , doesn't return anything  """
@@ -171,7 +153,6 @@ class Elec_LCA:
                 methods=self.method_list,
                 mapping_filepath=self.mapping_filepath
             )
-
             self.modified_datapack[loc] = modified_dataset.copy()
             self.tech_dict[loc] = tech_dict.copy()
             self.tech_map[loc] = tech_map.copy()
@@ -185,10 +166,15 @@ class Elec_LCA:
             self.scenario_mapping = {idx: name for idx, name in enumerate(df_of_modified_scenario.index.to_list())}
             self.list_of_df_scenario[loc] = df_of_modified_scenario
 
+            # array_to_mod = [
+            #     ((tech_map[tech]["name"], tech_map[tech]["reference product"], tech_map[tech]["location"]),
+            #     ("market for electricity, high voltage", "electricity, high voltage", loc))
+            #      for tech in self.list_of_df_scenario[loc].columns.to_list()]
+
             self.index_array_to_modify[loc] = np.array(
-                [(tech_map[tech]["name"],
-                  tech_map[tech]["reference product"],
-                  tech_map[tech]["location"]) for tech in self.list_of_df_scenario[loc].columns.to_list()],
+                [(tech_dict[tech_map[tech]["name"], tech_map[tech]["reference product"], tech_map[tech]["location"]],
+                  tech_dict[("market for electricity, high voltage", "electricity, high voltage", loc)])
+                 for tech in tech_map.keys()],
                 dtype=bwp.INDICES_DTYPE)
 
             self.data_array_to_modify[loc] = df_of_modified_scenario.to_numpy()

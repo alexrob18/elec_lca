@@ -57,7 +57,10 @@ def searching_dataset(database, act_dict):
         act_filter.append(wurst.either(*[wurst.searching.equals("location", loc) for loc in ["GLO", "RoW"]])) # putting RoW or GLO instead
         ds = [a for a in wurst.searching.get_many(database, *act_filter)][0] # search the GLO or RoW activity
         ds = wurst.transformations.copy_to_new_location(ds, act_dict['location']) # change the activity main location
-        ds = wurst.transformations.relink_technosphere_exchanges(ds, database) # adapt the activity foreground
+        try:
+            ds = wurst.transformations.relink_technosphere_exchanges(ds, database) # adapt the activity foreground
+        except:
+            pass
         database.append(ds) # add the new LCI dataset to the database
 
     return ds
@@ -74,7 +77,6 @@ def new_electricity_market(database, location, df_scenario, methods, mapping_fil
     :return: (datapackage) database datapackage
     '''
     name_database = database[0]['database']
-
     exchanges = [{
         'amount': 1.0,
         'type': 'production',
@@ -87,32 +89,22 @@ def new_electricity_market(database, location, df_scenario, methods, mapping_fil
 
     tech_list = list(df_scenario.technology.unique()) # list of technologies involved in the scenario
     tech_dict_used = {}
-    tech_to_remove = []
     for tech in tech_list: # create the list of exchanges (i.e., shares of the electricity mix)
         print(tech)
-        try:
-            temp_tech_dict = mapping(tech=tech, location=location, mapping_filepath=mapping_filepath)
-            tech_dict_used[tech] = temp_tech_dict.copy()
-            ds = searching_dataset(database=database, act_dict=temp_tech_dict)
-            exc = {
-                'amount': float(df_scenario[df_scenario.technology == tech].value.iloc[0]),
-                'type': 'technosphere',
-                'name': ds['name'],
-                'database': name_database,
-                'product': ds['reference product'],
-                'unit': ds['unit'],
-                'location': ds['location']
-            }
-            exchanges.append(exc)
-        except Exception as e:
-            if tech == "Onshore turbines":
-                raise e
-            print(tech)
-            print(e)
-            tech_to_remove.append(tech)
-    for tech in tech_to_remove:
-        print(tech)
-        tech_list.remove(tech)
+        # try:
+        temp_tech_dict = mapping(tech=tech, location=location, mapping_filepath=mapping_filepath)
+        ds = searching_dataset(database=database, act_dict=temp_tech_dict)
+        exc = {
+            'amount': float(df_scenario[df_scenario.technology == tech].value.iloc[0]),
+            'type': 'technosphere',
+            'name': ds['name'],
+            'database': name_database,
+            'product': ds['reference product'],
+            'unit': ds['unit'],
+            'location': ds['location']
+        }
+        exchanges.append(exc)
+        tech_dict_used[tech] = temp_tech_dict.copy()
 
     # Add everything that is in high voltage but is not a technology
     ds = searching_dataset(
@@ -155,6 +147,7 @@ def new_electricity_market(database, location, df_scenario, methods, mapping_fil
     #     del bw2data.databases[f'ecoinvent_updated_electricity_mix_{location}']
     # wurst.write_brightway2_database(db, f'ecoinvent_updated_electricity_mix_{location}') # write new database in brightway
 
-    dps, tech_dict, bio_dict = create_datapackage(database, methods=methods)
+    dps, tech_dict, bio_dict = create_datapackage(db, methods=methods)
+
 
     return dps, tech_dict, bio_dict, tech_dict_used

@@ -168,4 +168,6 @@ def create_datapackage(database: list, methods: list) -> [Package, dict, dict]:
 
         datapackages.append(dp)
 
+    print(len(datapackages))
+
     return datapackages, tech_dict, bio_dict
