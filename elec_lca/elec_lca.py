@@ -238,7 +238,7 @@ class Elec_LCA:
 
                     results_list.append(res.copy())
 
-        self.df_results = pd.concat(results_list, axis=0).set_index(["location", "period", "scenario", "impact_method"])
+        self.df_results = pd.concat(results_list, axis=0)
 
     # get results
     # def get_specific_results(self, scenario, period, location, impact_method):
