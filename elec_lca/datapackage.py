@@ -54,7 +54,7 @@ def convert_wurst_to_arrays(database):
                     [i, indices[(e["name"], e["product"], e["location"])]]
                 )
                 technosphere_values.append(e["amount"])
-                signs.append(True if e["type"] == "technosphere" else False)
+                signs.append(False if e["type"] == "technosphere" else True)
 
             elif e["type"] == "biosphere":
                 key = (

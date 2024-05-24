@@ -6,6 +6,7 @@ from pathlib import Path
 import pkg_resources
 import elec_lca
 
+from elec_lca.datapackage import create_datapackage
 
 def mapping(tech, location, mapping_filepath=None):
     '''
@@ -56,7 +57,10 @@ def searching_dataset(database, act_dict):
         act_filter.append(wurst.either(*[wurst.searching.equals("location", loc) for loc in ["GLO", "RoW"]])) # putting RoW or GLO instead
         ds = [a for a in wurst.searching.get_many(database, *act_filter)][0] # search the GLO or RoW activity
         ds = wurst.transformations.copy_to_new_location(ds, act_dict['location']) # change the activity main location
-        ds = wurst.transformations.relink_technosphere_exchanges(ds, database) # adapt the activity foreground
+        try:
+            ds = wurst.transformations.relink_technosphere_exchanges(ds, database) # adapt the activity foreground
+        except:
+            pass
         database.append(ds) # add the new LCI dataset to the database
 
     return ds
@@ -159,6 +163,6 @@ def new_electricity_market(database, location, df_scenario, methods, mapping_fil
     #     del bw2data.databases[f'ecoinvent_updated_electricity_mix_{location}']
     # wurst.write_brightway2_database(db, f'ecoinvent_updated_electricity_mix_{location}') # write new database in brightway
 
-    dps, tech_dict, bio_dict = elec_lca.datapackage.create_datapackage(database, methods=methods)
+    dps, tech_dict, bio_dict = create_datapackage(db, methods=methods)
 
-    return dps, tech_dict, bio_dict
+    return dps, tech_dict, bio_dict, act_dict_all_techs
