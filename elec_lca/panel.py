@@ -1,12 +1,12 @@
 from pathlib import Path
-from elec_lca.reading import read_user_input_template_excel_file
 import openpyxl
 import panel as pn
 import pandas as pd
 import plotly.graph_objs as go
 
+df_scenarios = pd.read_csv('../elec_lca/data/scenarios.csv')
+
 def stacked_area_chart(scenario):
-    df_scenarios = read_user_input_template_excel_file('../data', 'user_input_template.xlsm')
 
     layout = go.Layout(
         paper_bgcolor='rgba(0,0,0,0)',
@@ -69,7 +69,7 @@ widget_select_start_year = pn.widgets.Select(
 )
 widget_select_end_year = pn.widgets.Select(
     name='End Year',
-    options=[2020, 2021, 2022]
+    options=[2030, 2040, 2050]
 )
 multi_select_location = pn.widgets.MultiSelect(
     name='Location',
@@ -89,9 +89,9 @@ df = pd.DataFrame({
     'str': ['A', 'B', 'C'],
     'bool': [True, False, True],
 }, index=[1, 2, 3])
-widget_df_input_data = pn.widgets.DataFrame(df, name='Inputs', sizing_mode='stretch_both')
+widget_df_input_data = pn.widgets.DataFrame(df_scenarios, name='Inputs', sizing_mode='stretch_both')
 widget_df_results = pn.widgets.DataFrame(df, name='Results', sizing_mode='stretch_both')
-widget_plotly_pane_results = pn.pane.Plotly(stacked_area_chart("BAU"))
+widget_plotly_pane_results = pn.pane.Plotly(stacked_area_chart("NZ50"))
 
 gspec = pn.GridSpec(sizing_mode='stretch_both', max_height=800)
 
