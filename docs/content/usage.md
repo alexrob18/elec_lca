@@ -30,3 +30,17 @@ Users can explore the interactive plots built for a case study on [Canada Energy
 - <b>scenarios</b>: projections of different development pathways, the case study showcases two scenarios (Business as Usual (BAU) vs. Net-zero 2050) 
 - <b>sparse technosphere matrix</b>:  a sparse matrix (known as technology A matrix) in LCA calculation, more about [matrix in LCA](https://github.com/Depart-de-Sentier/Spring-School-2024/blob/main/class-materials/brightway-basics/2%20-%20Building%20and%20using%20matrices%20in%20bw2calc.ipynb)
 - <b>additional_elec_arrays</b>: storing changed electricity market for each location, scenario, periods, speeding up the LCA calculation without changing the technosphere matrix
+
+sparse technosphere matrix serves as the base A matrix for each LCA calculation per scenarios/periods, illustrated as: 
+|      | … | … | electricity [col_ind = n] | … |
+| ---- | - | - | ------------------------- | - |
+| …    | … | … | …                         | … |
+| wind | … | … | value_x, [i, n]           | … |
+| coal | … | … | value_y, [j, n]           | … |
+| …    | … | … | …                         | … |
+
+the additional_elec_arrays consistes of: 1. index_array_to_modify (the indice from the A matrix for certain electricity technology), and 2. data_array_to_modify (value to overwrite the base A matrix)
+|      | index_array_to_modify | data_array_to_modify |
+| ---- | --------------------- | -------------------- |
+| wind | [i, n]                | value_n              |
+| coal | [j, n]                | value_m              |
