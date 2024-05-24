@@ -1,11 +1,11 @@
 # %%
 import bw2io as bi
 import bw2data as bd
-import bw2calc as bc
-from bw_graph_tools import NewNodeEachVisitGraphTraversal
-import pandas as pd
+#import bw2calc as bc
+#from bw_graph_tools import NewNodeEachVisitGraphTraversal
+#import pandas as pd
 import panel as pn
-import elec_lca
+#import elec_lca
 import plotly.graph_objs as go
 
 #https://panel.holoviz.org/developer_guide/extensions.html#extension-plugins
@@ -13,6 +13,7 @@ pn.extension()
 
 # BRIGHTWAY SETUP ###############################################################
 
+'''
 def check_for_brightway_project():
     if 'bw2_spring_school' not in bd.projects:
         bi.install_project(project_key='bw2_spring_school', overwrite_existing=True)
@@ -21,10 +22,12 @@ def check_for_brightway_project():
     return db
 
 db = check_for_brightway_project()
+'''
 
 # IMPORT DATA ###################################################################
 
-df_scenarios = elec_lca.reading.read_user_input_template_excel_file('../data', 'user_input_template.xlsm')
+df_scenarios = pd.read_excel()
+#elec_lca.reading.read_user_input_template_excel_file('../data', 'user_input_template.xlsm')
 
 # PANEL SETUP ###################################################################
 
@@ -37,6 +40,7 @@ widget_button_NZ50 = pn.widgets.Button(
     name='NZ50 scenario',
     button_type='success'
 )
+
 
 def stacked_area_chart(scenario):
 
