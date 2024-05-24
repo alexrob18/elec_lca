@@ -6,10 +6,10 @@ import bw2calc as bc
 import bw2data
 import json
 
-from reading import read_user_input_template_excel_file
-from create_datasets import new_electricity_market
-from create_user_input_file import create_user_input_file
-from lcia import get_lcia_method_names
+from .reading import read_user_input_template_excel_file
+from .create_datasets import new_electricity_market
+from .create_user_input_file import create_user_input_file
+from .lcia import get_lcia_method_names
 
 
 class Elec_LCA:
@@ -238,7 +238,8 @@ class Elec_LCA:
 
                     results_list.append(res.copy())
 
-        self.df_results = pd.concat(results_list, axis=0).set_index(["location", "period", "scenario", "impact_method"])
+        self.df_results = pd.concat(results_list, axis=0).set_index(
+            ["location", "period", "scenario", "impact_method"]).reset_index()
 
     # get results
     # def get_specific_results(self, scenario, period, location, impact_method):

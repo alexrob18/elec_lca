@@ -4,8 +4,7 @@ import bw_processing as bwp
 import numpy as np
 import json
 import copy
-
-from lcia import get_lcia_methods
+from .lcia import get_lcia_methods
 
 DIR_DATAPACKAGE_TEMP = Path.cwd() / "export" / "temp"
 DIR_DATAPACKAGE = Path.cwd() / "export" / "datapackage"
