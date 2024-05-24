@@ -87,6 +87,7 @@ def new_electricity_market(database, location, df_scenario, methods, mapping_fil
 
     tech_list = list(df_scenario.technology.unique()) # list of technologies involved in the scenario
     tech_dict_used = {}
+    tech_to_remove = []
     for tech in tech_list: # create the list of exchanges (i.e., shares of the electricity mix)
         print(tech)
         try:
@@ -103,8 +104,15 @@ def new_electricity_market(database, location, df_scenario, methods, mapping_fil
                 'location': ds['location']
             }
             exchanges.append(exc)
-        except:
-            tech_list.remove(tech)
+        except Exception as e:
+            if tech == "Onshore turbines":
+                raise e
+            print(tech)
+            print(e)
+            tech_to_remove.append(tech)
+    for tech in tech_to_remove:
+        print(tech)
+        tech_list.remove(tech)
 
     # Add everything that is in high voltage but is not a technology
     ds = searching_dataset(

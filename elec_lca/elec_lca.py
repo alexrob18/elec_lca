@@ -44,7 +44,7 @@ class Elec_LCA:
     bio_dict = {}
     df_scenario = None
 
-    index_array_to_modify = None
+    index_array_to_modify = {}
     data_array_to_modify = {}
 
     list_of_df_scenario = {}
@@ -185,6 +185,14 @@ class Elec_LCA:
             self.scenario_mapping = {idx: name for idx, name in enumerate(df_of_modified_scenario.index.to_list())}
             self.list_of_df_scenario[loc] = df_of_modified_scenario
 
+            self.index_array_to_modify[loc] = np.array(
+                [(tech_map[tech]["name"],
+                  tech_map[tech]["reference product"],
+                  tech_map[tech]["location"]) for tech in self.list_of_df_scenario[loc].columns.to_list()],
+                dtype=bwp.INDICES_DTYPE)
+
+            self.data_array_to_modify[loc] = df_of_modified_scenario.to_numpy()
+
     def view_available_location(self):
         """ to print out the modified locations """
         print("This object contains modified dataset for the following location:")
@@ -211,19 +219,12 @@ class Elec_LCA:
             for loc in self.modified_datapack.keys():
 
                 current_datapack = self.modified_datapack[loc][impact_method]
-                current_tech_dict = self.tech_dict[loc]
-
-                self.index_array_to_modify = np.array([(self.tech_map[tech]["name"],
-                                                        self.tech_map[tech]["reference product"],
-                                                        self.tech_map[tech]["location"])
-                                                        for tech in self.list_of_df_scenario[loc].columns.to_list()],
-                                                      dtype=bwp.INDICES_DTYPE)
 
                 dp_scenarios = bwp.create_datapackage(combinatorial=True, sequential=True)
                 dp_scenarios.add_persistent_array(
                         matrix='technosphere_matrix',
-                        indices_array=self.index_array_to_modify,
-                        data_array=np.array(self.data_array_to_modify[loc]),
+                        indices_array=self.index_array_to_modify[loc],
+                        data_array=self.data_array_to_modify[loc],
                         flip_array=np.array([False]),
                         name='cf scenario'
                     )
