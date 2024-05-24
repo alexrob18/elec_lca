@@ -9,7 +9,7 @@ database = load_db(r"C:\myprojects\SpringSchool\ei391.pickle")
 elec_obj = Elec_LCA(database, "TRACI v2.1")
 
 
-def stacked_area_chart(df_scenario):
+def stacked_area_chart(df_scenario, col):
 
     layout = go.Layout(
         paper_bgcolor='rgba(0,0,0,0)',
@@ -18,11 +18,11 @@ def stacked_area_chart(df_scenario):
 
     fig = go.Figure(layout=layout)
     df_scenario = df_scenario.sort_values(by=['period'])
-    tech_list = list(df_scenario.technology.unique())
+    tech_list = list(df_scenario[col].unique())
     t = list(df_scenario.period.unique())
 
     for tech in tech_list:
-        data = list(100 * df_scenario[df_scenario.technology == tech].value)
+        data = list(100 * df_scenario[df_scenario[col] == tech].value)
         fig.add_trace(go.Scatter(
             x=t, y=data,
             # hoverinfo='x+y',
@@ -83,9 +83,9 @@ widget_button_calculate_lca = pn.widgets.Button(
 df_scenarios = pd.DataFrame()
 df = pd.DataFrame()
 widget_df_input_data = pn.widgets.DataFrame(df_scenarios, name='Inputs', sizing_mode='stretch_both')
-widget_plotly_pane_input = pn.pane.Plotly()
+widget_plotly_pane_input = pn.pane.Plotly(sizing_mode='stretch_both')
 widget_df_results = pn.widgets.DataFrame(df, name='Results', sizing_mode='stretch_both')
-widget_plotly_pane_results = pn.pane.Plotly()
+widget_plotly_pane_results = pn.pane.Matplotlib(sizing_mode='stretch_both')
 
 gspec = pn.GridSpec(sizing_mode='stretch_both', max_height=800)
 
@@ -145,7 +145,7 @@ def show_inputs(event):
     df_scns = df_scns[(df_scns["period"] >= start_year) & (df_scns["period"] <= end_year)].copy()
     df_scns = df_scns[df_scns["location"] == location].copy()
     widget_df_input_data.value = df_scns
-    widget_plotly_pane_input.object = stacked_area_chart(df_scns)
+    widget_plotly_pane_input.object = stacked_area_chart(df_scns, "technology")
 
 
 widget_button_show_data.on_click(show_inputs)
@@ -162,7 +162,8 @@ def show_results(event):
     df_results = df_results[(df_results["period"] >= start_year) & (df_results["period"] <= end_year)].copy()
     df_results = df_results[df_results["location"] == location].copy()
     widget_df_results.value = df_results
-    widget_plotly_pane_results.object = stacked_area_chart(df_results)
+    elec_obj.create_plot_for_1_loc(location, scenario)
+    widget_plotly_pane_results.object = elec_obj.results_fiure
 
 
 widget_button_calculate_lca.on_click(show_results)
