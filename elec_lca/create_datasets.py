@@ -6,7 +6,7 @@ from pathlib import Path
 import pkg_resources
 import elec_lca
 
-from elec_lca.datapackage import create_datapackage
+from local_datapackage import create_datapackage
 
 def mapping(tech, location, mapping_filepath=None):
     """

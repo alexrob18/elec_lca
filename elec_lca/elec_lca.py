@@ -6,10 +6,10 @@ import bw2calc as bc
 import bw2data
 import json
 
-from elec_lca.reading import read_user_input_template_excel_file
-from elec_lca.create_datasets import new_electricity_market
-from elec_lca.create_user_input_file import create_user_input_file
-from elec_lca.lcia import get_lcia_method_names
+from reading import read_user_input_template_excel_file
+from create_datasets import new_electricity_market
+from create_user_input_file import create_user_input_file
+from lcia import get_lcia_method_names
 
 
 class Elec_LCA:
@@ -47,6 +47,8 @@ class Elec_LCA:
     index_array_to_modify = {}
     data_array_to_modify = {}
 
+    results_fiure = None
+
     list_of_df_scenario = {}
     scenario_mapping = None # tuple (scenario, period)
     df_results = None
@@ -62,7 +64,6 @@ class Elec_LCA:
     def load_custom_mapping_to_ei(self, mapping_filepath):
         """     locate the technology mapping file , doesn't return anything  """
         self.mapping_filepath = mapping_filepath
-
 
     def create_input_file(self, output_directory):
         """
@@ -177,7 +178,7 @@ class Elec_LCA:
     def view_available_location(self):
         """ to print out the modified locations """
         print("This object contains modified dataset for the following location:")
-        for loc in self.modified_database.keys():
+        for loc in self.modified_datapack.keys():
             print(f"...{loc}")
 
     def compute_lca_score_for_all_scenario(self):
@@ -212,7 +213,7 @@ class Elec_LCA:
                     )
 
                 lca = bc.LCA(
-                    demand={self.tech_dict[loc][("market for electricity, high voltage", "electricity, high voltage",
+                    demand={self.tech_dict[loc][("market for electricity, low voltage", "electricity, low voltage",
                                                  loc)]: 1},
                     data_objs=[current_datapack, dp_scenarios],
                     use_arrays=True,
@@ -275,4 +276,21 @@ class Elec_LCA:
             return
 
         return self.df_results
+
+    # format
+    def create_plot_for_1_loc(self, loc, scenario):
+        df = self.get_all_results().copy().reset_index()
+        df = df[df["location"] == loc]
+        df = df[df["scenario"] == scenario]
+        df_min = df[df["period"] == df["period"].min()].rename(columns={"value": "min_val"}).drop(columns="period")
+
+        df = pd.merge(df, df_min, on=['location', "scenario", "impact_method"], how="left")
+        df["value"] = df["value"] / df["min_val"]
+        df = df.drop(columns="min_val")
+
+        df = df.pivot(index="period", columns=("scenario", "location", "impact_method"), values="value")
+        fig = df.plot(figsize=(12, 8))
+        fig.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+        self.results_fiure = fig
 
