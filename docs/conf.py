@@ -114,5 +114,6 @@ autoapi_ignore = [
     '*.yml',
     '*.md',
     '*.json',
-    '*.data'
+    '*.data',
+    '*/.ipynb_checkpoints/*',
 ]
