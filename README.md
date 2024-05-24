@@ -27,6 +27,23 @@ You can install _elec_lca_ via [pip] from [PyPI]:
 $ pip install elec_lca
 ```
 
+## Objective
+To transform a whole background ecoinvent database (tested with v3.9.1 cutoff) through user-specified electricity market mix for a certain location, for user-defined scenario(s) and periods.
+
+## Requirement
+<li>Users need to provide their own background database, the ecoinvent database is not included in this package.</li>
+<li>Required packages are given in <i>requirements.txt </i> Run the following commands to install the package: </li>
+
+```
+git clone https://github.com/alexrob18/elec_lca.git
+cd elec_lca (or your local repo path)
+pip install -r requirements.txt
+``` 
+
+
+## How to use it
+The best way is to follow the example notebook in the example folder.
+
 ## Contributing
 
 Contributions are very welcome.
