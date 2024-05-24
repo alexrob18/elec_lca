@@ -3,7 +3,7 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.12 (bw2_dds2024_elec)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (bw2_dds2024_elec)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="elec_lca" project-jdk-type="Python SDK" />
   <component name="PyCharmProfessionalAdvertiser">
     <option name="shown" value="true" />
   </component>
