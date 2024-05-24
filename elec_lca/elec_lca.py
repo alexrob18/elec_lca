@@ -166,18 +166,13 @@ class Elec_LCA:
             self.scenario_mapping = {idx: name for idx, name in enumerate(df_of_modified_scenario.index.to_list())}
             self.list_of_df_scenario[loc] = df_of_modified_scenario
 
-            # array_to_mod = [
-            #     ((tech_map[tech]["name"], tech_map[tech]["reference product"], tech_map[tech]["location"]),
-            #     ("market for electricity, high voltage", "electricity, high voltage", loc))
-            #      for tech in self.list_of_df_scenario[loc].columns.to_list()]
-
             self.index_array_to_modify[loc] = np.array(
                 [(tech_dict[tech_map[tech]["name"], tech_map[tech]["reference product"], tech_map[tech]["location"]],
                   tech_dict[("market for electricity, high voltage", "electricity, high voltage", loc)])
                  for tech in tech_map.keys()],
                 dtype=bwp.INDICES_DTYPE)
 
-            self.data_array_to_modify[loc] = df_of_modified_scenario.to_numpy()
+            self.data_array_to_modify[loc] = np.transpose(df_of_modified_scenario.to_numpy())
 
     def view_available_location(self):
         """ to print out the modified locations """
@@ -185,7 +180,7 @@ class Elec_LCA:
         for loc in self.modified_database.keys():
             print(f"...{loc}")
 
-    def compute_lca_score_for_all_scenario(self, impact_method_list):
+    def compute_lca_score_for_all_scenario(self):
         """
         compute the final lca score for all scenarios and years, combined into one final dataframe
 
@@ -199,58 +194,53 @@ class Elec_LCA:
         df_results: the lca results run though matrix calcuation from lca_results.py , get_elec_impact
         """
 
+        results_dict = {}
         results_list = []
 
-        for impact_method in self.method_list:
+        for idx, impact_method in enumerate(self.method_list):
             for loc in self.modified_datapack.keys():
 
-                current_datapack = self.modified_datapack[loc][impact_method]
+                current_datapack = self.modified_datapack[loc][idx]
 
-                dp_scenarios = bwp.create_datapackage(combinatorial=True, sequential=True)
+                dp_scenarios = bwp.create_datapackage(sequential=True)
                 dp_scenarios.add_persistent_array(
                         matrix='technosphere_matrix',
                         indices_array=self.index_array_to_modify[loc],
                         data_array=self.data_array_to_modify[loc],
-                        flip_array=np.array([False]),
-                        name='cf scenario'
+                        # flip_array=np.array([False for _ in range(len(self.index_array_to_modify[loc]))]),
+                        name='scenario'
                     )
 
                 lca = bc.LCA(
-                    demand={'market for electricity, high voltage': 1},
+                    demand={self.tech_dict[loc][("market for electricity, high voltage", "electricity, high voltage",
+                                                 loc)]: 1},
                     data_objs=[current_datapack, dp_scenarios],
                     use_arrays=True,
                 )
                 lca.lci()
                 lca.lcia()
 
+                lca.keep_first_iteration()
                 scenario_mapping = self.scenario_mapping
 
-                # save first results
-                resource_group = next(grp for grp in lca.technosphere_mm.groups).indexer.indexer
-                (scn, per) = scenario_mapping[resource_group.index]
-                res = pd.DataFrame(columns=["location", "period", "scenario"] + impact_method_list)
-                res["location"] = [loc]
-                res["period"] = per
-                res["scenario"] = scn
-                for method in impact_method_list:
-                    res[method] = 0 if method != impact_method else lca.score
-                results_list.append(res.copy())
-
-                for scenario_result in lca:
-                    (scn, per) = scenario_mapping[resource_group.index]
-                    res = pd.DataFrame(columns=["location", "period", "scenario"] + impact_method_list)
+                for _, (scn, per)  in scenario_mapping.items():
+                    next(lca)
+                    res = pd.DataFrame(columns=["location", "period", "scenario", "impact_method", "value"])
                     res["location"] = [loc]
-                    res["period"] = per
                     res["scenario"] = scn
-                    for method in impact_method_list:
-                        res[method] = 0 if method != impact_method else lca.score
+                    res["period"] = per
+                    res["impact_method"] = impact_method
+                    res["value"] = lca.score
 
                     results_list.append(res.copy())
+                    results_dict[(loc, scn, per, impact_method)] = [lca.score]
 
-        self.df_results = pd.concat(results_list, axis=0).set_index(["location", "period", "scenario"])
+        print(results_dict)
+
+        self.df_results = pd.concat(results_list, axis=0).set_index(["location", "period", "scenario", "impact_method"])
 
     # get results
-    def get_specific_results(self, scenario, period, location):
+    def get_specific_results(self, scenario, period, location, impact_method):
         """
         get lca result for specific scenario and year(s) from the final df_results prepared in compute_lca_score_for_all_scenario()  
 
@@ -259,6 +249,7 @@ class Elec_LCA:
         scenario: specific scenario to get from the final df_results
         period:   specific period to get from the final df_results
         location: specific location to get from the final df_results
+        impact_method : specific impact method to get from the final df_results
 
         Returns
         -------
@@ -269,21 +260,13 @@ class Elec_LCA:
             print("results has not been generated")
             return
 
-        if (location, period, scenario) not in self.df_results.index.tolist():
+        if (location, scenario, period, impact_method) not in self.df_results.index.tolist():
             print("No input were provided for target scenario, period, location")
             return
 
         temp_res = self.df_results.copy()
-        temp_res = temp_res[(temp_res["scenario"] == scenario)
-                            & (temp_res["period"] == period)
-                            % (temp_res["location"] == location)]
 
-        results_dict = {}
-        for col in self.df_results.copy():
-            results_dict[col] = self.df_results.at[(location, period, scenario), col]
-
-        print(results_dict)
-        return results_dict
+        return temp_res.at[(location, scenario, period, impact_method), "value"]
 
     def get_all_results(self):
         """ get all the combined scenarios, years, locations results dataframe """
