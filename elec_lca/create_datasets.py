@@ -163,6 +163,6 @@ def new_electricity_market(database, location, df_scenario, methods, mapping_fil
     #     del bw2data.databases[f'ecoinvent_updated_electricity_mix_{location}']
     # wurst.write_brightway2_database(db, f'ecoinvent_updated_electricity_mix_{location}') # write new database in brightway
 
-    dps, tech_dict, bio_dict = create_datapackage(db, methods=methods)
+    dps, tech_dict, bio_dict = create_datapackage(database, methods=methods)
 
     return dps, tech_dict, bio_dict, act_dict_all_techs

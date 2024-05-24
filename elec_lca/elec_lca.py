@@ -10,7 +10,7 @@ from elec_lca.reading import read_user_input_template_excel_file
 from elec_lca.create_datasets import new_electricity_market
 from elec_lca.create_user_input_file import create_user_input_file
 from elec_lca.lcia import get_lcia_method_names
-from elec_lca.lca_results import get_elec_impact, get_elec_A_mat_indice_for_Scn_x_Year_t
+from elec_lca.lca_results import get_elec_impact
 
 
 class Elec_LCA:
