@@ -47,6 +47,8 @@ class Elec_LCA:
     index_array_to_modify = {}
     data_array_to_modify = {}
 
+    results_fiure = None
+
     list_of_df_scenario = {}
     scenario_mapping = None # tuple (scenario, period)
     df_results = None
@@ -275,4 +277,21 @@ class Elec_LCA:
             return
 
         return self.df_results
+
+    # format
+    def create_plot_for_1_loc(self, loc, scenario):
+        df = self.get_all_results().copy().reset_index()
+        df = df[df["location"] == loc]
+        df = df[df["scenario"] == scenario]
+        df_min = df[df["period"] == df["period"].min()].rename(columns={"value": "min_val"}).drop(columns="period")
+
+        df = pd.merge(df, df_min, on=['location', "scenario", "impact_method"], how="left")
+        df["value"] = df["value"] / df["min_val"]
+        df = df.drop(columns="min_val")
+
+        df = df.pivot(index="period", columns=("scenario", "location", "impact_method"), values="value")
+        fig = df.plot(figsize=(12, 8))
+        fig.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+        self.results_fiure = fig
 
