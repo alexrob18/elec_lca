@@ -10,7 +10,6 @@ from elec_lca.reading import read_user_input_template_excel_file
 from elec_lca.create_datasets import new_electricity_market
 from elec_lca.create_user_input_file import create_user_input_file
 from elec_lca.lcia import get_lcia_method_names
-from elec_lca.lca_results import get_elec_impact, get_elec_A_mat_indice_for_Scn_x_Year_t
 
 
 class Elec_LCA:
@@ -51,6 +50,7 @@ class Elec_LCA:
     list_of_df_scenario = {}
     scenario_mapping = None # tuple (scenario, period)
     df_results = None
+    status = None
 
     def __init__(self, original_database, methode_family):
         self.original_database = original_database
@@ -194,9 +194,9 @@ class Elec_LCA:
         df_results: the lca results run though matrix calcuation from lca_results.py , get_elec_impact
         """
 
-        results_dict = {}
         results_list = []
-
+        permutation_to_do = (len(self.method_list) * len(self.modified_datapack.keys()) * len(self.scenario_mapping))
+        i = 0
         for idx, impact_method in enumerate(self.method_list):
             for loc in self.modified_datapack.keys():
 
@@ -223,7 +223,10 @@ class Elec_LCA:
                 lca.keep_first_iteration()
                 scenario_mapping = self.scenario_mapping
 
-                for _, (scn, per)  in scenario_mapping.items():
+                for _, (scn, per) in scenario_mapping.items():
+                    i += 1
+                    self.status = f"lca {i} out of {permutation_to_do}"
+                    print(self.status)
                     next(lca)
                     res = pd.DataFrame(columns=["location", "period", "scenario", "impact_method", "value"])
                     res["location"] = [loc]
@@ -233,40 +236,37 @@ class Elec_LCA:
                     res["value"] = lca.score
 
                     results_list.append(res.copy())
-                    results_dict[(loc, scn, per, impact_method)] = [lca.score]
-
-        print(results_dict)
 
         self.df_results = pd.concat(results_list, axis=0).set_index(["location", "period", "scenario", "impact_method"])
 
     # get results
-    def get_specific_results(self, scenario, period, location, impact_method):
-        """
-        get lca result for specific scenario and year(s) from the final df_results prepared in compute_lca_score_for_all_scenario()  
-
-        Parameters
-        ----------
-        scenario: specific scenario to get from the final df_results
-        period:   specific period to get from the final df_results
-        location: specific location to get from the final df_results
-        impact_method : specific impact method to get from the final df_results
-
-        Returns
-        -------
-        results_dict: dict storing lca dataframe for selected scenario, period, location
-        """
-        
-        if self.df_results is None:
-            print("results has not been generated")
-            return
-
-        if (location, scenario, period, impact_method) not in self.df_results.index.tolist():
-            print("No input were provided for target scenario, period, location")
-            return
-
-        temp_res = self.df_results.copy()
-
-        return temp_res.at[(location, scenario, period, impact_method), "value"]
+    # def get_specific_results(self, scenario, period, location, impact_method):
+    #     """
+    #     get lca result for specific scenario and year(s) from the final df_results prepared in compute_lca_score_for_all_scenario()
+    #
+    #     Parameters
+    #     ----------
+    #     scenario: specific scenario to get from the final df_results
+    #     period:   specific period to get from the final df_results
+    #     location: specific location to get from the final df_results
+    #     impact_method : specific impact method to get from the final df_results
+    #
+    #     Returns
+    #     -------
+    #     results_dict: dict storing lca dataframe for selected scenario, period, location
+    #     """
+    #
+    #     if self.df_results is None:
+    #         print("results has not been generated")
+    #         return
+    #
+    #     if (location, period, scenario,  impact_method) not in self.df_results.index.tolist():
+    #         print("No input were provided for target scenario, period, location")
+    #         return
+    #
+    #     temp_res = self.df_results.copy()
+    #
+    #     return temp_res.at[(location, scenario, period, impact_method), "value"]
 
     def get_all_results(self):
         """ get all the combined scenarios, years, locations results dataframe """
